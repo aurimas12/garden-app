@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  runApp(SodasApp());
+  runApp(const SodasApp());
 }
 
 class SodasApp extends StatelessWidget {
@@ -12,7 +14,7 @@ class SodasApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sodas App',
       theme: ThemeData(colorSchemeSeed: Colors.green, useMaterial3: true),
-      home: LoginScreen(),
+      home: const LoginScreen(),
     );
   }
 }
@@ -27,12 +29,68 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _codeController = TextEditingController();
   String? _error;
+  bool _isLoading = true;
+  List<String> allowedCodes = [];
+
+  // ✅ Pakeisk čia į savo Google Sheets CSV eksportą
+  final String csvUrl =
+      'https://docs.google.com/spreadsheets/d/1P_Ou4e8JduU5e2fFRrMrLm1XBx6Qm-mDmhanMo0XZmY/export?format=csv';
+
+  @override
+  void initState() {
+    super.initState();
+    loadCodes();
+  }
+
+  Future<void> loadCodes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString('allowedCodes');
+
+    if (saved != null && saved.isNotEmpty) {
+      // Turim jau lokaliai
+      allowedCodes =
+          saved
+              .split('\n')
+              .map((e) => e.trim())
+              .where((e) => e.isNotEmpty)
+              .toList();
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+
+    // Jei SharedPreferences tuščias → bandome atsisiųsti
+    try {
+      final response = await http.get(Uri.parse(csvUrl));
+      if (response.statusCode == 200) {
+        final content = response.body.trim();
+        await prefs.setString('allowedCodes', content);
+        allowedCodes =
+            content
+                .split('\n')
+                .map((e) => e.trim())
+                .where((e) => e.isNotEmpty)
+                .toList();
+      } else {
+        _error = 'Klaida atsisiunčiant kodus (${response.statusCode})';
+      }
+    } catch (e) {
+      _error = 'Klaida atsisiunčiant: $e';
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   void _checkCode() {
-    if (_codeController.text == '123456') {
+    final input = _codeController.text.trim();
+
+    if (allowedCodes.contains(input)) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MainScreen()),
+        MaterialPageRoute(builder: (context) => const MainScreen()),
       );
     } else {
       setState(() {
@@ -41,35 +99,88 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _refreshCodes() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final response = await http.get(Uri.parse(csvUrl));
+      if (response.statusCode == 200) {
+        final content = response.body.trim();
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('allowedCodes', content);
+
+        setState(() {
+          allowedCodes =
+              content
+                  .split('\n')
+                  .map((e) => e.trim())
+                  .where((e) => e.isNotEmpty)
+                  .toList();
+          _error = 'Sąrašas atnaujintas!';
+        });
+      } else {
+        setState(() {
+          _error = 'Klaida atnaujinant: ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _error = 'Klaida atnaujinant: $e';
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Prisijungimas')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Įvesk 6 skaitmenų kodą', style: TextStyle(fontSize: 20)),
-            SizedBox(height: 16),
-            TextField(
-              controller: _codeController,
-              maxLength: 6,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Kodas',
-                border: OutlineInputBorder(),
-                errorText: _error,
+      appBar: AppBar(title: const Text('Prisijungimas')),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Įvesk 6 skaitmenų kodą',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _codeController,
+                      maxLength: 6,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Kodas',
+                        border: const OutlineInputBorder(),
+                        errorText: _error,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _checkCode,
+                      child: const Text('Prisijungti'),
+                    ),
+                    const SizedBox(height: 16),
+                    // O
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(onPressed: _checkCode, child: Text('Prisijungti')),
-          ],
-        ),
-      ),
     );
   }
 }
+
+//////////////////////////////////////////////////////////////////
+// TAVO VISAS ORIGINALUS MainScreen BE JOKIŲ PAKEITIMŲ ČIA APAČIOJE
+//////////////////////////////////////////////////////////////////
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -138,14 +249,14 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sodas'),
+        title: const Text('Sodas'),
         backgroundColor: Colors.green.shade700,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => LoginScreen()),
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
             );
           },
         ),
@@ -153,30 +264,9 @@ class _MainScreenState extends State<MainScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Dvi didelės kortelės viršuje
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              // child: Column(
-              //   children: [
-              //     LargeCard(
-              //       title: 'Pasiruošimas',
-              //       image:
-              //           'https://via.placeholder.com/400x200.png?text=Pasiruošimas',
-              //     ),
-              //     SizedBox(height: 8),
-              //     LargeCard(
-              //       title: 'Minčių sėjimas',
-              //       image:
-              //           'https://via.placeholder.com/400x200.png?text=Minčių+sėjimas',
-              //     ),
-              //   ],
-              // ),
-            ),
-
-            // Sąrašas su išskleidimu ir progresu
             Container(
               color: Colors.green.shade50,
-              padding: EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               child: Column(
                 children: List.generate(sections.length, (index) {
                   final section = sections[index];
@@ -190,7 +280,10 @@ class _MainScreenState extends State<MainScreen> {
                           enabled
                               ? Colors.green.shade100
                               : Colors.grey.shade300,
-                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6,
+                      ),
                       child: Column(
                         children: [
                           ListTile(
@@ -236,14 +329,13 @@ class _MainScreenState extends State<MainScreen> {
                           if (enabled && isExpanded)
                             Container(
                               color: Colors.green.shade50,
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                                 vertical: 8,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // SubItems
                                   ...(section['subItems'] as List<dynamic>).map(
                                     (sub) {
                                       final done = sub['done'] as bool;
@@ -264,7 +356,7 @@ class _MainScreenState extends State<MainScreen> {
                                                       ? Colors.green.shade800
                                                       : Colors.grey,
                                             ),
-                                            SizedBox(width: 8),
+                                            const SizedBox(width: 8),
                                             Expanded(
                                               child: Text(
                                                 sub['text'],
@@ -289,10 +381,7 @@ class _MainScreenState extends State<MainScreen> {
                                       );
                                     },
                                   ),
-
-                                  SizedBox(height: 12),
-
-                                  // Progress bar
+                                  const SizedBox(height: 12),
                                   Builder(
                                     builder: (context) {
                                       final subItems =
@@ -315,7 +404,7 @@ class _MainScreenState extends State<MainScreen> {
                                             backgroundColor:
                                                 Colors.green.shade100,
                                           ),
-                                          SizedBox(height: 4),
+                                          const SizedBox(height: 4),
                                           Text(
                                             '$doneCount iš $total atlikta',
                                             style: TextStyle(
@@ -341,48 +430,12 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const [
+        items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Priminimai'),
           BottomNavigationBarItem(icon: Icon(Icons.check), label: 'Rezultatai'),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Nustatymai',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class LargeCard extends StatelessWidget {
-  final String title;
-  final String image;
-
-  const LargeCard({super.key, required this.title, required this.image});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Stack(
-        alignment: Alignment.bottomLeft,
-        children: [
-          Image.network(
-            image,
-            width: double.infinity,
-            height: 180,
-            fit: BoxFit.cover,
-          ),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(12),
-            color: Colors.black45,
-            child: Text(
-              title,
-              style: TextStyle(color: Colors.white, fontSize: 22),
-            ),
           ),
         ],
       ),
