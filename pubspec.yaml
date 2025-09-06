@@ -34,11 +34,26 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  shared_preferences: ^2.5.3
+  shared_preferences: ^2.2.2
   http: ^1.4.0
   excel: ^4.0.6
   fl_chart: ^0.64.0
 
+  permission_handler: ^12.0.1
+
+ 
+  share_plus: ^11.1.0
+
+  file_saver: ^0.2.12
+  just_audio: ^0.10.4
+  audio_session: ^0.2.2
+  intl: ^0.20.2
+  audioplayers: ^6.5.0
+  record: ^6.1.1
+  record_web: ^1.0.3
+
+  
+  url_launcher: ^6.3.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -62,7 +77,21 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+    - assets/audio/kvepavimas.mp3
+    - assets/audio/stebejimas.mp3
+    - assets/audio/judesiai.mp3
+    - assets/audio/kunoskenavimas.mp3
+    - assets/audio/relaksacija.mp3
+    - assets/audio/kalnomeditacija.mp3
+    - assets/audio/stebejimas.mp3
+    - assets/audio/sedejimomeditacija.mp3
+    - assets/audio/saugivieta.mp3
+    - assets/audio/pedos.mp3
+    - assets/audio/mylintisgerumas3.mp3
+    - assets/audio/esamojolaiko.mp3
+    - assets/moods/
+    - assets/sections/
     # - assets/tasks_data.json
   #  - assets/tasks.xlsx
     # - assets/images/
