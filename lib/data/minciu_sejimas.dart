@@ -3,10 +3,10 @@ import 'package:garden_app/screens/mood_emoji_page.dart';
 import 'package:garden_app/screens/paged_task_screen.dart';
 import 'package:garden_app/screens/pages/jegu_atstatymas.dart';
 import 'package:garden_app/screens/pages/minciu_task.dart';
-import 'package:garden_app/screens/pages/profesine_savijauta.dart';
+
 
 List<Task> buildMinciuSejimasTasks() {
-  // 1) 4 Komponentai
+
   late final Task kaipViskasVyks;
   kaipViskasVyks = Task(
     text: '4 Komponentai',
@@ -32,7 +32,7 @@ List<Task> buildMinciuSejimasTasks() {
         ),
   );
 
-  // 2) Automatinės mintys
+
   late final Task kaipViskasVyks2;
   kaipViskasVyks2 = Task(
     text: 'Automatinės mintys',
@@ -58,7 +58,7 @@ List<Task> buildMinciuSejimasTasks() {
         ),
   );
 
-  // 3) Realybės interpretacijos
+
   late final Task kaipViskasVyks3;
   kaipViskasVyks3 = Task(
     text: 'Realybės interpretacijos',
@@ -84,7 +84,7 @@ List<Task> buildMinciuSejimasTasks() {
         ),
   );
 
-  // 4) Minčių persėjimas
+
   late final Task kaipViskasVyks4;
   kaipViskasVyks4 = Task(
     text: 'Minčių persėjimas',
@@ -110,7 +110,6 @@ List<Task> buildMinciuSejimasTasks() {
         ),
   );
 
-  // 5) Mintys kaip debesys
   late final Task kaipViskasVyks5;
   kaipViskasVyks5 = Task(
     text: 'Mintys kaip debesys',
@@ -136,7 +135,7 @@ List<Task> buildMinciuSejimasTasks() {
         ),
   );
 
-  // 6) Neramios mintys
+
   late final Task kaipViskasVyks6;
   kaipViskasVyks6 = Task(
     text: 'Neramios mintys',
@@ -162,7 +161,6 @@ List<Task> buildMinciuSejimasTasks() {
         ),
   );
 
-  // 7) Aplinkos stebėjimas
   late final Task kaipViskasVyks7;
   kaipViskasVyks7 = Task(
     text: 'Aplinkos stebėjimas',

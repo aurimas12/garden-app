@@ -6,7 +6,7 @@ import 'package:garden_app/screens/pages/jegu_atstatymas.dart';
 import 'package:garden_app/screens/pages/zydejimas_task.dart';
 
 List<Task> buildZydejimasTasks() {
-  // 1) Sėdėti ir stebėti
+
   late final Task kaipViskasVyks;
   kaipViskasVyks = Task(
     text: 'Sėdėti ir stebėti',
@@ -33,7 +33,7 @@ List<Task> buildZydejimasTasks() {
         ),
   );
 
-  // 2) Nurimti, kad pastebėti
+
   late final Task kaipViskasVyks2;
   kaipViskasVyks2 = Task(
     text: 'Nurimti, kad pastebėti',
@@ -59,7 +59,7 @@ List<Task> buildZydejimasTasks() {
         ),
   );
 
-  // 3) Buvimo džiaugsmas
+
   late final Task kaipViskasVyks3;
   kaipViskasVyks3 = Task(
     text: 'Buvimo džiaugsmas',
@@ -112,7 +112,7 @@ List<Task> buildZydejimasTasks() {
         ),
   );
 
-  // 5) Perfekcionizmui
+
   late final Task kaipViskasVyks5;
   kaipViskasVyks5 = Task(
     text: 'Perfekcionizmui',
@@ -138,7 +138,7 @@ List<Task> buildZydejimasTasks() {
         ),
   );
 
-  // 6) Netobulai
+  
   late final Task kaipViskasVyks6;
   kaipViskasVyks6 = Task(
     text: 'Netobulai',
@@ -164,7 +164,7 @@ List<Task> buildZydejimasTasks() {
         ),
   );
 
-  // 7) Mylintis gerumas
+ 
   late final Task kaipViskasVyks7;
   kaipViskasVyks7 = Task(
     text: 'Mylintis gerumas',

@@ -46,7 +46,7 @@ class _Phq9PageState extends State<Phq9Page> {
 
   @override
   Widget build(BuildContext context) {
-    // 🔸 Registruojam hook’ą po frame’o—taip 100% pagauna NotificationListener tėve
+   
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       RegisterOnNextNotification(() async {
@@ -61,10 +61,9 @@ class _Phq9PageState extends State<Phq9Page> {
               context,
             ).showSnackBar(SnackBar(content: Text('Siuntimas nepavyko: $e')));
           }
-          // Grąžink false, jei nori sulaikyti perėjimą.
-          // return false;
+          
         }
-        return true; // leisti „Toliau/Užbaigti“
+        return true; 
       }).dispatch(context);
     });
 

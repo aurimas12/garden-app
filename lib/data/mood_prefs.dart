@@ -6,7 +6,7 @@ class MoodPrefs {
   static const _kCounts = 'mood_counts_json';
   static const _kHistory = 'mood_history_json';
 
-  /// Įrašo paskutinį pasirinkimą, atnaujina dažnius ir prideda į istoriją.
+
   static Future<void> record(
     String emoji, {
     String? taskId,
@@ -14,10 +14,10 @@ class MoodPrefs {
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
-    // 1) paskutinis pasirinkimas
+
     await prefs.setString(_kLastMood, emoji);
 
-    // 2) dažniai
+
     final countsRaw = prefs.getString(_kCounts);
     final Map<String, int> counts =
         countsRaw != null
@@ -28,7 +28,7 @@ class MoodPrefs {
     counts[emoji] = (counts[emoji] ?? 0) + 1;
     await prefs.setString(_kCounts, jsonEncode(counts));
 
-    // 3) istorija (ribojam iki 500 įrašų, kad neaugtų be galo)
+
     final historyRaw = prefs.getString(_kHistory);
     final List<dynamic> history =
         historyRaw != null
@@ -72,18 +72,3 @@ class MoodPrefs {
     await prefs.remove(_kHistory);
   }
 }
-// import 'package:shared_preferences/shared_preferences.dart';
-
-// class MoodPrefs {
-//   static const _kLastEmoji = 'last_emoji';
-
-//   static Future<void> saveLast(String emoji) async {
-//     final sp = await SharedPreferences.getInstance();
-//     await sp.setString(_kLastEmoji, emoji);
-//   }
-
-//   static Future<String?> loadLast() async {
-//     final sp = await SharedPreferences.getInstance();
-//     return sp.getString(_kLastEmoji);
-//   }
-// }

@@ -4,7 +4,7 @@ import 'package:garden_app/screens/paged_task_screen.dart';
 import 'package:garden_app/screens/pages/pirmieji_vaisiai_task.dart';
 
 List<Task> buildPirmiejiVaisiaiTasks() {
-  // 1) Vertybės
+
   late final Task kaipViskasVyks;
   kaipViskasVyks = Task(
     text: 'Vertybės',
@@ -30,7 +30,7 @@ List<Task> buildPirmiejiVaisiaiTasks() {
         ),
   );
 
-  // 2) Gyvenimo sritys
+
   late final Task kaipViskasVyks2;
   kaipViskasVyks2 = Task(
     text: 'Gyvenimo sritys',
@@ -56,7 +56,7 @@ List<Task> buildPirmiejiVaisiaiTasks() {
         ),
   );
 
-  // 3) Kokių vaisių nori?
+
   late final Task kaipViskasVyks3;
   kaipViskasVyks3 = Task(
     text: 'Kokių vaisių nori?',
@@ -82,7 +82,7 @@ List<Task> buildPirmiejiVaisiaiTasks() {
         ),
   );
 
-  // 4) Pauzė
+  
   late final Task kaipViskasVyks4;
   kaipViskasVyks4 = Task(
     text: 'Pauzė',
@@ -108,7 +108,7 @@ List<Task> buildPirmiejiVaisiaiTasks() {
         ),
   );
 
-  // 5) O būna tiesiog taip
+
   late final Task kaipViskasVyks5;
   kaipViskasVyks5 = Task(
     text: 'O būna tiesiog taip',
@@ -134,7 +134,7 @@ List<Task> buildPirmiejiVaisiaiTasks() {
         ),
   );
 
-  // 6) Dėkingumas
+
   late final Task kaipViskasVyks6;
   kaipViskasVyks6 = Task(
     text: 'Dėkingumas',
@@ -160,7 +160,7 @@ List<Task> buildPirmiejiVaisiaiTasks() {
         ),
   );
 
-  // 7) Su šypsena
+
   late final Task kaipViskasVyks7;
   kaipViskasVyks7 = Task(
     text: 'Su šypsena',

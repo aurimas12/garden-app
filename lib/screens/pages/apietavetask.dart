@@ -136,7 +136,7 @@ class QuestionnairePage extends StatelessWidget {
   }
 }
 
-// Page4: Klausimai apie Tave (2 dalis)
+
 class FinalQuestionsPage extends StatelessWidget {
   const FinalQuestionsPage({super.key});
 
@@ -180,7 +180,7 @@ class FinalQuestionsPage extends StatelessWidget {
   }
 }
 
-// Page5: Pabaigos žinutė
+
 class FinalPage extends StatelessWidget {
   const FinalPage({super.key});
 

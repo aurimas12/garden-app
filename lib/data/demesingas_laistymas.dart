@@ -5,7 +5,7 @@ import 'package:garden_app/screens/pages/demesingas_laistymas_task.dart';
 import 'package:garden_app/screens/pages/jegu_atstatymas.dart';
 
 List<Task> buildDemesingasLaistymasTasks() {
-  // 1) Laistyti motyvaciją
+
   late final Task kaipViskasVyks;
   kaipViskasVyks = Task(
     text: 'Laistyti motyvaciją',
@@ -31,7 +31,7 @@ List<Task> buildDemesingasLaistymasTasks() {
         ),
   );
 
-  // 2) Geras miegas
+
   late final Task kaipViskasVyks2;
   kaipViskasVyks2 = Task(
     text: 'Geras miegas',
@@ -57,7 +57,7 @@ List<Task> buildDemesingasLaistymasTasks() {
         ),
   );
 
-  // 3) Maistas
+
   late final Task kaipViskasVyks3;
   kaipViskasVyks3 = Task(
     text: 'Maistas',
@@ -83,7 +83,7 @@ List<Task> buildDemesingasLaistymasTasks() {
         ),
   );
 
-  // 4) Laistyti kūną
+
   late final Task kaipViskasVyks4;
   kaipViskasVyks4 = Task(
     text: 'Laistyti kūną',
@@ -109,7 +109,7 @@ List<Task> buildDemesingasLaistymasTasks() {
         ),
   );
 
-  // 5) Judėjimo svarba
+
   late final Task kaipViskasVyks5;
   kaipViskasVyks5 = Task(
     text: 'Judėjimo svarba',
@@ -136,7 +136,7 @@ List<Task> buildDemesingasLaistymasTasks() {
         ),
   );
 
-  // 6) Kūno skenavimas
+
   late final Task kaipViskasVyks6;
   kaipViskasVyks6 = Task(
     text: 'Kūno skenavimas',
@@ -163,7 +163,7 @@ List<Task> buildDemesingasLaistymasTasks() {
         ),
   );
 
-  // 7) Vis palaistyti
+
   late final Task kaipViskasVyks7;
   kaipViskasVyks7 = Task(
     text: 'Vis palaistyti',

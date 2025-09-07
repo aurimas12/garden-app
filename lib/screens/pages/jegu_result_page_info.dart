@@ -1,4 +1,3 @@
-// lib/screens/pages/jegu_results_info_page.dart
 import 'package:flutter/material.dart';
 
 class JeguResultsInfoPage1 extends StatelessWidget {
@@ -119,7 +118,7 @@ class JeguResultsInfoPage1 extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // --- Tavo pilnas paaiškinamasis tekstas ---
+      
           Text(
             'Tavo savijautos klausimyno rezultatas – $savijautaScore. '
             'Kuo didesnis balas – tuo geresnė savijauta. Jeigu balas žemesnis nei 13 – rodo prastą savijautą, '
@@ -127,10 +126,7 @@ class JeguResultsInfoPage1 extends StatelessWidget {
             style: body,
           ),
           const SizedBox(height: 12),
-          // Text(
-          //   '0–7   8–12   13–19   20–25',
-          //   style: body?.copyWith(fontFeatures: const []),
-          // ),
+       
           const SizedBox(height: 16),
           Text(
             'Atsistatymo nuo streso skalėje surinkai – $recoveryScore. '
@@ -141,8 +137,7 @@ class JeguResultsInfoPage1 extends StatelessWidget {
             'Validation of the Recovery Experience Questionnaire in a Lithuanian Healthcare Personnel).',
             style: body,
           ),
-          // const SizedBox(height: 12),
-          // Text('16–31   32–39   40–47   48–55   56–64', style: body),
+    
           const SizedBox(height: 16),
           Text(
             'Jeigu jauti, kad savijauta ar stresas apsunkina kasdienę veiklą, santykius, kelia nuolatinę kančią – verta ieškoti pagalbos: '

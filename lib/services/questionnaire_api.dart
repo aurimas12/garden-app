@@ -10,23 +10,12 @@ String get _baseUrl {
 }
 
 class QuestionnaireApi {
-  /// POST /api/questionnaire/submissions/
-  /// headers:
-  ///   Content-Type: application/json
-  ///   X-Account-Id: <id>
-  /// body:
-  /// {
-  ///   "kind": "phq9" | "gad7",
-  ///   "answers": [0,1,null, ...],
-  ///   "total": 12 | null,
-  ///   "task_code": "Nuotaika",
-  ///   "client_time": "ISO8601"
-  /// }
+ 
   static Future<void> submit({
     required int accountId,
     required String kind,
-    required List<int?> answers, // leidžiam null
-    int? total, // leidžiam null
+    required List<int?> answers, 
+    int? total, 
     required String taskCode,
     DateTime? clientTime,
   }) async {

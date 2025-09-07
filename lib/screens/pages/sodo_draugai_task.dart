@@ -271,7 +271,7 @@ class SiltiLinkejimaiPage extends StatelessWidget {
             textAlign: TextAlign.justify,
           ),
 
-          // const Spacer(),
+  
         ],
       ),
     );
@@ -451,7 +451,7 @@ class ElgesioPalyginimasPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Lentelės antraštės
+     
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
@@ -477,7 +477,7 @@ class ElgesioPalyginimasPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
 
-          // Žodinis elgesys
+   
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
@@ -506,7 +506,7 @@ class ElgesioPalyginimasPage extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Nežodinis elgesys
+  
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
@@ -634,7 +634,7 @@ class ElgesioStiliaiDetaliauPage extends StatelessWidget {
   }
 }
 
-/// Maža pagalbinė lentelė 3 stulpeliams (Pasyvus / Asertyvus / Agresyvus)
+
 class _TripleTable extends StatelessWidget {
   final String title;
   final String left;
@@ -677,7 +677,7 @@ class _TripleTable extends StatelessWidget {
             border: const TableBorder(
               horizontalInside: BorderSide(color: Color(0xFFBFDCC3)),
               verticalInside: BorderSide(color: Color(0xFFBFDCC3)),
-              // Išoriniai rėmai jau padaryti per Container.decoration
+      
             ),
             children: [
               TableRow(

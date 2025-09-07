@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
-import '../screens/paged_task_screen.dart';
-import '../screens/paged_task_screen.dart' show NextPageNotification;
 
-/// Vienas šablonas visiems tekstiniams puslapiams.
-/// - Automatinis „centravimas“ plačiuose ekranuose (max 720 px).
-/// - Pasirenkamas antraštės paveikslėlis (asset).
-/// - Titulas, „lead“ (įžanga stambesniu šriftu), paragrafų sąrašas arba
-///   bet koks `children` turinys.
-/// - CTA mygtukas apačioje; jei `ctaAdvances=true` – spausdamas vartotojas
-///   pereina į kitą PagedTaskScreen puslapį.
-/// - Viskas slenkama, pritaikyta labai ilgam tekstui.
+
+
 class SodoTemplate extends StatelessWidget {
   final String? headerImageAsset;
   final double headerAspectRatio;
@@ -39,7 +31,6 @@ class SodoTemplate extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    // Pagrindinis scroll konteineris
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Center(
@@ -48,7 +39,7 @@ class SodoTemplate extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Hero paveikslėlis (nebūtina)
+         
               if (headerImageAsset != null) ...[
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
@@ -73,7 +64,6 @@ class SodoTemplate extends StatelessWidget {
                 const SizedBox(height: 16),
               ],
 
-              // Kortelė su turiniu
               Container(
                 padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
                 decoration: BoxDecoration(
@@ -112,7 +102,7 @@ class SodoTemplate extends StatelessWidget {
                       const SizedBox(height: 14),
                     ],
 
-                    // Jei paduoti paragrafai – suformatuojam tvarkingai
+               
                     if (paragraphs != null)
                       ...paragraphs!.map(
                         (p) => Padding(
@@ -127,10 +117,10 @@ class SodoTemplate extends StatelessWidget {
                         ),
                       ),
 
-                    // Papildomas turinys (widget'ai)
+           
                     if (children != null) ...children!,
 
-                    // CTA mygtukas
+                 
                     if (ctaText != null) ...[
                       const SizedBox(height: 12),
                       Align(
@@ -140,10 +130,7 @@ class SodoTemplate extends StatelessWidget {
                             if (onCta != null) {
                               await onCta!();
                             }
-                            // if (ctaAdvances && context.mounted) {
-                            //   // pranešam PagedTaskScreen, kad eitų į kitą puslapį
-                            //   NextPageNotification().dispatch(context);
-                            // }
+                           
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
@@ -169,7 +156,7 @@ class SodoTemplate extends StatelessWidget {
   }
 }
 
-/// Patogus „bullet“ elementas, kur reikia punktų.
+
 class SodoBullet extends StatelessWidget {
   final String text;
   const SodoBullet(this.text, {super.key});

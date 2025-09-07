@@ -5,7 +5,7 @@ import 'package:garden_app/screens/pages/jegu_atstatymas.dart';
 import 'package:garden_app/screens/pages/sodinukai_task.dart';
 
 List<Task> buildSodinukaiTasks() {
-  // 1) Gauti, kad duoti
+
   late final Task kaipViskasVyks;
   kaipViskasVyks = Task(
     text: 'Gauti, kad duoti',
@@ -31,7 +31,7 @@ List<Task> buildSodinukaiTasks() {
         ),
   );
 
-  // 2) Malonumų sodinukai
+  
   late final Task kaipViskasVyks2;
   kaipViskasVyks2 = Task(
     text: 'Malonumų sodinukai',
@@ -57,7 +57,7 @@ List<Task> buildSodinukaiTasks() {
         ),
   );
 
-  // 3) Ribų sodinukai
+
   late final Task kaipViskasVyks3;
   kaipViskasVyks3 = Task(
     text: 'Ribų sodinukai',
@@ -83,7 +83,7 @@ List<Task> buildSodinukaiTasks() {
         ),
   );
 
-  // 4) Įsisąmoninti gavimą
+
   late final Task kaipViskasVyks4;
   kaipViskasVyks4 = Task(
     text: 'Įsisąmoninti gavimą',
@@ -109,7 +109,7 @@ List<Task> buildSodinukaiTasks() {
         ),
   );
 
-  // 5) Davimo sodinukai
+
   late final Task kaipViskasVyks5;
   kaipViskasVyks5 = Task(
     text: 'Davimo sodinukai',
@@ -135,7 +135,7 @@ List<Task> buildSodinukaiTasks() {
         ),
   );
 
-  // 6) Kaip pasodinti perdegimą
+ 
   late final Task kaipViskasVyks6;
   kaipViskasVyks6 = Task(
     text: 'Kaip pasodinti perdegimą',
@@ -161,7 +161,7 @@ List<Task> buildSodinukaiTasks() {
         ),
   );
 
-  // 7) Atsigręžti į kūną
+
   late final Task kaipViskasVyks7;
   kaipViskasVyks7 = Task(
     text: 'Atsigręžti į kūną',

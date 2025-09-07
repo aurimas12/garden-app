@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Vaikai gali priregistruoti „prieš pereinant“ darbą (pvz. validacija, siuntimas).
-/// Jei callback grąžina true -> einame „Toliau/Užbaigti“, jei false -> liekame tame pačiame psl.
+
 class RegisterOnNextNotification extends Notification {
   final Future<bool> Function()? beforeNext;
   const RegisterOnNextNotification(this.beforeNext);
@@ -11,7 +10,7 @@ class PagedTaskScreen extends StatefulWidget {
   final String title;
   final VoidCallback onFinish;
   final List<Widget> pages;
-  final String? taskCode; // jeigu nori turėti užduoties kodą (nebūtina)
+  final String? taskCode;
 
   const PagedTaskScreen({
     super.key,
@@ -39,12 +38,12 @@ class _PagedTaskScreenState extends State<PagedTaskScreen> {
   }
 
   Future<void> _tryGoNext({Future<bool> Function()? beforeNext}) async {
-    // 1) jeigu puslapis priregistravo “beforeNext” – vykdom
+
     if (beforeNext != null) {
       final ok = await beforeNext();
       if (!ok) return;
     }
-    // 2) pereinam
+
     if (_isLast) {
       widget.onFinish();
       if (mounted) Navigator.of(context).pop();
@@ -71,14 +70,14 @@ class _PagedTaskScreenState extends State<PagedTaskScreen> {
       appBar: AppBar(title: Text(widget.title), backgroundColor: Colors.green),
       body: NotificationListener<RegisterOnNextNotification>(
         onNotification: (n) {
-          // Vaiko page kažką patikrino/įrašė ir paprašė pereiti
+ 
           _tryGoNext(beforeNext: n.beforeNext);
           return true;
         },
         child: Column(
           children: [
             const SizedBox(height: 10),
-            // indikatorius
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(widget.pages.length, (i) {
@@ -96,7 +95,7 @@ class _PagedTaskScreenState extends State<PagedTaskScreen> {
               }),
             ),
             const SizedBox(height: 8),
-            // turinys
+       
             Expanded(
               child: Container(
                 decoration: const BoxDecoration(
@@ -116,7 +115,7 @@ class _PagedTaskScreenState extends State<PagedTaskScreen> {
                 ),
               ),
             ),
-            // apačios juosta
+
             SafeArea(
               top: false,
               child: Container(

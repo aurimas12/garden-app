@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-// dėl NextPageNotification
 
-/// PAGE 1 – nuotaikos emoji
 class SavybesMoodEmojiPage extends StatefulWidget {
   const SavybesMoodEmojiPage({super.key});
 
@@ -64,7 +62,7 @@ class _SavybesMoodEmojiPageState extends State<SavybesMoodEmojiPage> {
   }
 }
 
-/// PAGE 2 – įvadas apie Didįjį Penketą
+
 class SavybesIntroPage extends StatelessWidget {
   const SavybesIntroPage({super.key});
 
@@ -119,7 +117,7 @@ class SavybesIntroPage extends StatelessWidget {
   }
 }
 
-/// PAGE 3 – 60 teiginių (Likert 1..5)
+
 class BigFiveScalePage extends StatefulWidget {
   const BigFiveScalePage({super.key});
 
@@ -128,7 +126,7 @@ class BigFiveScalePage extends StatefulWidget {
 }
 
 class _BigFiveScalePageState extends State<BigFiveScalePage> {
-  // -1 reiškia neatsakyta
+ 
   final List<int> _answers = List<int>.filled(60, -1);
 
   static const List<String> _labels = [
@@ -145,7 +143,7 @@ class _BigFiveScalePageState extends State<BigFiveScalePage> {
   Widget build(BuildContext context) {
     final style = Theme.of(context).textTheme.bodyLarge;
 
-    // visos 60 formuluočių:
+
     const qs = <String>[
       'Aš esu draugiškas/a, socialus/i',
       'Aš esu užjaučiantis/i, geraširdis/ė',
@@ -225,7 +223,7 @@ class _BigFiveScalePageState extends State<BigFiveScalePage> {
         ),
         const SizedBox(height: 12),
 
-        // 60 kortelių:
+     
         ...List.generate(qs.length, (i) {
           final qNum = i + 1;
           return Container(
@@ -276,7 +274,7 @@ class _BigFiveScalePageState extends State<BigFiveScalePage> {
   }
 }
 
-/// PAGE 4 – rezultatų paaiškinimas (statiškas tekstas)
+
 class SavybesResultsInfoPage extends StatelessWidget {
   const SavybesResultsInfoPage({super.key});
 
@@ -334,7 +332,7 @@ class SavybesResultsInfoPage extends StatelessWidget {
   }
 }
 
-/// PAGE 5 – pabaiga / refleksija
+
 class SavybesEndPage extends StatelessWidget {
   const SavybesEndPage({super.key});
 

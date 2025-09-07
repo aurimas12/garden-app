@@ -33,7 +33,7 @@ List<Task> buildPuoselejimasTasks() {
         ),
   );
 
-  // 2) Dar prieš perdegant
+
   late final Task kaipViskasVyks2;
   kaipViskasVyks2 = Task(
     text: 'Dar prieš perdegant',
@@ -59,7 +59,7 @@ List<Task> buildPuoselejimasTasks() {
         ),
   );
 
-  // 3) Saugi vieta
+
   late final Task kaipViskasVyks3;
   kaipViskasVyks3 = Task(
     text: 'Saugi vieta',
@@ -86,7 +86,7 @@ List<Task> buildPuoselejimasTasks() {
         ),
   );
 
-  // 4) Kūryba ir žaidimas
+ 
   late final Task kaipViskasVyks4;
   kaipViskasVyks4 = Task(
     text: 'Kūryba ir žaidimas',
@@ -112,7 +112,7 @@ List<Task> buildPuoselejimasTasks() {
         ),
   );
 
-  // 5) Skalės
+
   late final Task kaipViskasVyks5;
   kaipViskasVyks5 = Task(
     text: 'Skalės',
@@ -148,7 +148,7 @@ List<Task> buildPuoselejimasTasks() {
         ),
   );
 
-  // 6) Sodo vizualizacija
+ 
   late final Task kaipViskasVyks6;
   kaipViskasVyks6 = Task(
     text: 'Sodo vizualizacija',
@@ -174,7 +174,7 @@ List<Task> buildPuoselejimasTasks() {
         ),
   );
 
-  // 7) Laiškas
+
   late final Task kaipViskasVyks7;
   kaipViskasVyks7 = Task(
     text: 'Laiškas',

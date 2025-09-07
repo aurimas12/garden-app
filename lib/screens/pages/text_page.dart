@@ -18,7 +18,7 @@ class TextPage1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextTemplate(
-      standalone: false, // nes PagedTaskScreen turi savo scroll
+      standalone: false, 
       imageAsset: imageAsset,
       title: title,
       subtitle: subtitle,

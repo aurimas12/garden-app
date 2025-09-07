@@ -27,7 +27,7 @@ class JeguResultsInfoPage extends StatelessWidget {
       sectionWidths.add(width);
     }
 
-    // pozicija markeriui
+
     final markerPos = ((value - min) / (max - min)) * totalWidth;
 
     return Column(

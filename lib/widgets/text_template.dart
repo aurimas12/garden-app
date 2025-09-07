@@ -6,7 +6,7 @@ class TextTemplate extends StatelessWidget {
   final String? imageAsset;
   final List<Widget> children;
 
-  /// Jei `true` – pats susikuria scroll'ą. PagedTaskScreen viduje DĖK `false`.
+
   final bool standalone;
 
   final double maxContentWidth;
@@ -76,7 +76,7 @@ class TextTemplate extends StatelessWidget {
       ),
     );
 
-    if (!standalone) return inner; // PagedTaskScreen turi savo scroll'ą
+    if (!standalone) return inner;
 
     return Center(
       child: SingleChildScrollView(
@@ -124,7 +124,7 @@ class _HeaderImage extends StatelessWidget {
   }
 }
 
-/// Patogūs teksto blokai
+
 class P extends StatelessWidget {
   final String text;
   final TextStyle? style;

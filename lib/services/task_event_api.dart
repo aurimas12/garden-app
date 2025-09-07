@@ -1,4 +1,3 @@
-// lib/services/task_event_api.dart
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -14,7 +13,7 @@ class TaskEventApi {
   static Future<void> send({
     required String pin,
     required String taskCode,
-    required String event, // "open" | "done" | "cancel"
+    required String event,
     DateTime? clientTime,
     Map<String, dynamic>? payload,
   }) async {

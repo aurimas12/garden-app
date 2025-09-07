@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../paged_task_screen.dart' show RegisterOnNextNotification;
 
-/// Helperis: registruoja onNext tik MATOMAM puslapiui ir tik KARTĄ.
-/// Grąžina true, jei užregistravo šį kartą (naudinga debugui, bet nebūtina).
+
 bool _registerOnNextOnceWhenVisible({
   required BuildContext context,
   required bool alreadyRegistered,
@@ -11,17 +10,17 @@ bool _registerOnNextOnceWhenVisible({
 }) {
   if (alreadyRegistered) return false;
 
-  // Jeigu puslapis yra offstage arba išjungtas TickerMode – laikome „nematomu“
+
   final isOffstage =
       context.findAncestorWidgetOfExactType<Offstage>()?.offstage ?? false;
   final tickerOn = TickerMode.of(context);
   if (isOffstage || !tickerOn) return false;
 
-  // (neprivaloma) jeigu tai ne aktyvus route – irgi neregistruojam
+
   final route = ModalRoute.of(context);
   if (route != null && !route.isCurrent) return false;
 
-  // Užregistruojam po frame’o (kad tėvo NotificationListener būtinai jau klausytų)
+
   WidgetsBinding.instance.addPostFrameCallback((_) {
     if (!context.mounted) return;
     RegisterOnNextNotification(handler).dispatch(context);
@@ -30,9 +29,7 @@ bool _registerOnNextOnceWhenVisible({
   return true;
 }
 
-/// =======================================================
-/// 1) Nuotaikos emoji – saugo per „Toliau“ (pasirinktinai)
-/// =======================================================
+
 class ProfMoodEmojiPage extends StatefulWidget {
   const ProfMoodEmojiPage({super.key, this.onChanged, this.onSubmitted});
   final ValueChanged<String?>? onChanged;
@@ -119,9 +116,7 @@ class _ProfMoodEmojiPageState extends State<ProfMoodEmojiPage> {
   }
 }
 
-/// =======================================================
-/// 2) Rolės pasirinkimas – saugo per „Toliau“
-/// =======================================================
+
 class ProfRoleSelectPage extends StatefulWidget {
   const ProfRoleSelectPage({super.key, this.onChanged, this.onSubmitted});
   final ValueChanged<String?>? onChanged;
@@ -132,7 +127,7 @@ class ProfRoleSelectPage extends StatefulWidget {
 }
 
 class _ProfRoleSelectPageState extends State<ProfRoleSelectPage> {
-  String? _role; // 'medikas' | 'studentas'
+  String? _role;
   bool _onNextRegistered = false;
 
   @override
@@ -146,7 +141,7 @@ class _ProfRoleSelectPageState extends State<ProfRoleSelectPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Pasirink rolę, kad galėtume tęsti')),
           );
-          return false; // sulaikom perėjimą, kol nepasirinkta
+          return false; 
         }
         try {
           await widget.onSubmitted?.call(_role!);
@@ -156,7 +151,7 @@ class _ProfRoleSelectPageState extends State<ProfRoleSelectPage> {
               SnackBar(content: Text('Nepavyko išsaugoti rolės: $e')),
             );
           }
-          // jei nori – gali sulaikyti: return false;
+        
         }
         return true;
       },
@@ -241,18 +236,15 @@ class _ProfRoleSelectPageState extends State<ProfRoleSelectPage> {
   }
 }
 
-/// =======================================================
-/// 3) Maslach dalis (1..10 ir 11..22) – saugo per „Toliau“
-/// =======================================================
 typedef ProfMaslachSubmit = Future<void> Function(
   int from,
   int to,
-  Map<int, int> answers, // klausimoNr -> 0..6
+  Map<int, int> answers, 
 );
 
 class ProfMaslachScalePart extends StatefulWidget {
-  final int from; // 1-based
-  final int to; // 1-based
+  final int from; 
+  final int to; 
   final ValueChanged<Map<int, int>>? onChanged;
   final ProfMaslachSubmit? onSubmitted;
 
@@ -269,7 +261,7 @@ class ProfMaslachScalePart extends StatefulWidget {
 }
 
 class _ProfMaslachScalePartState extends State<ProfMaslachScalePart> {
-  final Map<int, int> _answers = {}; // klausimoNr -> 0..6
+  final Map<int, int> _answers = {};
   bool _onNextRegistered = false;
 
   static const _labels = [
@@ -347,7 +339,7 @@ class _ProfMaslachScalePartState extends State<ProfMaslachScalePart> {
               SnackBar(content: Text('Nepavyko išsaugoti Maslach dalies: $e')),
             );
           }
-          // jei nori sulaikyti: return false;
+     
         }
         return true;
       },
@@ -390,9 +382,6 @@ class _ProfMaslachScalePartState extends State<ProfMaslachScalePart> {
   }
 }
 
-/// =======================================================
-/// 4) Pabaiga
-/// =======================================================
 class ProfEndPage extends StatelessWidget {
   const ProfEndPage({super.key});
   @override

@@ -16,8 +16,7 @@ import '../models/task.dart';
 import '../screens/paged_task_screen.dart';
 import '../screens/pages/text_page.dart';
 
-/// --- HELPERIS: sukuria Task su EMOJI pirmajame puslapyje ---
-/// Jei reikia – gali įjungti `markDoneOnPick`, kad taškas grafike atsirastų iškart po pasirinkimo.
+
 typedef EmojiPageBuilder = Widget Function(ValueChanged<String> onChanged);
 
 Task makeTaskWithMood({
@@ -42,13 +41,13 @@ Task makeTaskWithMood({
             onFinish();
           },
           pages: [
-            // ← ČIA ir "sušaunami" visi išsaugojimai
+  
             (emojiBuilder ?? defaultEmoji)((emoji) async {
-              // vietinė būsena (kad grafike atsirastų)
+   
               t.mood = emoji;
               if (markDoneOnPick) t.done = true;
 
-              // siuntimas į backend
+ 
               try {
                 final prefs = await SharedPreferences.getInstance();
                 final id = prefs.getInt('account_id');
@@ -56,8 +55,7 @@ Task makeTaskWithMood({
                   await EmojiApi.save(
                     accountId: id,
                     emoji: emoji,
-                    taskCode: title, // pvz. "Nuotaika"
-                    // client_time prideda pati EmojiApi (DateTime.now().toUtc())
+                    taskCode: title, 
                   );
                 }
               } catch (e) {
@@ -73,9 +71,9 @@ Task makeTaskWithMood({
   return t;
 }
 
-/// --- TAVO UŽDUOTYS: dabar visoms automatiškai įdedamas emoji ---
+
 List<Task> buildPasiruosimasTasks() {
-  // 1) Kaip viskas vyks – su emoji pirmame puslapyje
+
   final kaipViskasVyks = makeTaskWithMood(
     title: 'Kaip viskas vyks',
     pages: const [
@@ -112,35 +110,10 @@ List<Task> buildPasiruosimasTasks() {
     ],
   );
 
-  // Phq9Page(
-  //       onSubmitted: (answers, total) async {
-  //         final id = Session.requireId();
-  //         await QuestionnaireApi.submit(
-  //           accountId: id,
-  //           kind: 'phq9',
-  //           answers: answers,
-  //           total: total,
-  //           taskCode: 'Nuotaika',
-  //         );
-  //         // čia gali parodyti SnackBar, jei nori
-  //       },
-  //     ),
-  //     Gad7Page(
-  //       onSubmitted: (answers, total) async {
-  //         final id = Session.requireId();
-  //         await QuestionnaireApi.submit(
-  //           accountId: id,
-  //           kind: 'gad7',
-  //           answers: answers,
-  //           total: total,
-  //           taskCode: 'Nuotaika',
-  //         );
-  //       },
-  //     ),
-  // 2) Nuotaika – emoji pirmas, po to skalės
+
   final nuotaika = makeTaskWithMood(
     title: 'Nuotaika',
-    // Jei nori, kad taškas grafike atsirastų iškart po emoji – įjunk:
+
     markDoneOnPick: true,
     pages: [
       TextPage1(
@@ -154,21 +127,21 @@ List<Task> buildPasiruosimasTasks() {
       // Gad7Page(),
       Phq9Page(
         onSubmitted: (answers, total) async {
-          final id = await Session.getAccountId(); // arba tavo sesijos gavimas
-          if (id == null) return; // arba gali parodyti klaidą
+          final id = await Session.getAccountId();
+          if (id == null) return;
           await QuestionnaireApi.submit(
             accountId: id,
             kind: 'phq9',
             answers: answers,
             total: total,
-            taskCode: 'Nuotaika', // arba dinamiškai, jei reikia
+            taskCode: 'Nuotaika',
           );
         },
       ),
 
       Gad7Page(
         onSubmitted: (answers, total) async {
-          final id = await Session.getAccountId(); // arba tavo sesijos gavimas
+          final id = await Session.getAccountId();
           if (id == null) return;
           await QuestionnaireApi.submit(
             accountId: id,
@@ -190,25 +163,19 @@ List<Task> buildPasiruosimasTasks() {
     ],
   );
 
-  // 3) Profesinė savijauta
+ 
   final profesine = makeTaskWithMood(
     title: 'Profesinė savijauta',
-    // jei turi ProfMoodEmojiPage su onChanged:
-    // emojiBuilder: (onChanged) => ProfMoodEmojiPage(onChanged: onChanged),
+
     pages: [
       ProfRoleSelectPage(),
-
-      // ProfMaslachScalePart(from: 1, to: 10),
-      // ProfMaslachScalePart(from: 11, to: 22),
       ProfMaslachScalePart(from: 1, to: 10),
-
-      // Jei dar nori saugot ir antrą dalį:
       ProfMaslachScalePart(from: 11, to: 22),
       ProfEndPage(),
     ],
   );
 
-  // 4) Savybės
+
   final savybes = makeTaskWithMood(
     title: 'Savybės',
     // emojiBuilder: (onChanged) => SavybesMoodEmojiPage(onChanged: onChanged),
@@ -232,7 +199,7 @@ List<Task> buildPasiruosimasTasks() {
     ],
   );
 
-  // 6) Šiek tiek apie Tave
+
   final apieTaveTask = makeTaskWithMood(
     title: 'Šiek tiek apie Tave',
     // emojiBuilder: (onChanged) => ProfMoodEmojiPage(onChanged: onChanged),
@@ -244,7 +211,7 @@ List<Task> buildPasiruosimasTasks() {
     ],
   );
 
-  // 7) Sodo fantazija
+
   final sodoFantazija = makeTaskWithMood(
     title: 'Sodo fantazija',
     // emojiBuilder: (onChanged) => ProfMoodEmojiPage(onChanged: onChanged),

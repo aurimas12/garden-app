@@ -1,4 +1,3 @@
-// lib/services/api.dart
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io' show Platform, SocketException;
@@ -32,7 +31,6 @@ class AuthApi {
         throw Exception('Blogas atsakymas: trūksta account_id');
       }
 
-      // Gražesnės žinutės pagal serverio error kodą
       final err = (body['error'] ?? '').toString();
       switch (err) {
         case 'PIN_REQUIRED':

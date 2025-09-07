@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-/// PAGE 1 – nuotaikos emoji
+
 class JeguMoodEmojiPage extends StatefulWidget {
   const JeguMoodEmojiPage({super.key});
 
@@ -64,7 +64,7 @@ class _JeguMoodEmojiPageState extends State<JeguMoodEmojiPage> {
   }
 }
 
-/// PAGE 2 – pirmas klausimynas (0–5 skalė, 5 teiginiai)
+
 class SavijautosScalePage extends StatefulWidget {
   const SavijautosScalePage({super.key});
 
@@ -142,7 +142,7 @@ class _SavijautosScalePageState extends State<SavijautosScalePage> {
   }
 }
 
-/// PAGE 3 – antras klausimynas (1–4 skalė, 16 teiginių)
+
 class RecoveryExperiencePage extends StatefulWidget {
   const RecoveryExperiencePage({super.key});
 
@@ -230,7 +230,6 @@ class _RecoveryExperiencePageState extends State<RecoveryExperiencePage> {
   }
 }
 
-/// PAGE 4 – rezultatų paaiškinimas
 class JeguResultsInfoPage extends StatelessWidget {
   const JeguResultsInfoPage({super.key});
 
@@ -248,7 +247,7 @@ class JeguResultsInfoPage extends StatelessWidget {
   }
 }
 
-/// PAGE 5 – pabaiga
+
 class JeguEndPage extends StatelessWidget {
   const JeguEndPage({super.key});
 
@@ -278,7 +277,6 @@ class apie1 extends StatelessWidget {
   }
 }
 
-// Page3: Klausimai apie Tave (1 dalis) su formomis
 
 class klausimynas1 extends StatefulWidget {
   const klausimynas1({super.key});
@@ -359,15 +357,7 @@ class _RoleSelectionPageState extends State<klausimynas1> {
           ),
           const SizedBox(height: 32),
 
-          // Center(
-          //   child: ElevatedButton(
-          //     onPressed: () {
-          //       // Čia galima validuoti arba perduoti duomenis
-          //       Navigator.pushNamed(context, '/page3');
-          //     },
-          //     child: const Text('Tęsti'),
-          //   ),
-          // ),
+        
         ],
       ),
     );
@@ -537,15 +527,7 @@ class _PsichologinisKlausimynasPageState
           ),
 
           const SizedBox(height: 32),
-          // Center(
-          //   child: ElevatedButton(
-          //     onPressed: () {
-          //       // Duomenų perdavimas arba validacija
-          //       Navigator.pushNamed(context, '/page3');
-          //     },
-          //     child: const Text('Tęsti'),
-          //   ),
-          // ),
+          
         ],
       ),
     );
@@ -787,10 +769,10 @@ class _AudioIntroPageState extends State<AudioIntroPage1> {
           ),
           const SizedBox(height: 32),
 
-          // Mygtukas įrašymo pradžiai (kol kas be funkcijos)
+         
           ElevatedButton.icon(
             onPressed: () {
-              // Čia vėliau bus įrašymo startas
+             
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Įrašymo pradžia (kol kas simuliacija)'),
@@ -802,10 +784,10 @@ class _AudioIntroPageState extends State<AudioIntroPage1> {
           ),
           const SizedBox(height: 16),
 
-          // Mygtukas be įrašymo
+      
           OutlinedButton(
             onPressed: () {
-              // Čia galima dėti Navigator.pushNamed į kitą puslapį
+            
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Pasirinkta tęsti be įrašymo')),
               );
@@ -894,25 +876,7 @@ class _PsichoKomponentaiPageState extends State<PsichoKomponentaiPage> {
           ),
 
           const SizedBox(height: 24),
-          // Center(
-          //   child: ElevatedButton(
-          //     onPressed:
-          //         widget.onNext ??
-          //         () {
-          //           // numatytoji elgsena: grįžti arba parodyti žinutę
-          //           if (Navigator.canPop(context)) {
-          //             Navigator.pop(context);
-          //           } else {
-          //             ScaffoldMessenger.of(context).showSnackBar(
-          //               const SnackBar(
-          //                 content: Text('Kitas žingsnis (nenustatytas)'),
-          //               ),
-          //             );
-          //           }
-          //         },
-          //     child: const Text('Kitas'),
-          //   ),
-          // ),
+         
         ],
       ),
     );
@@ -963,12 +927,11 @@ class _KvepavimoMeditacijaPageState extends State<KvepavimoMeditacijaPage> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -976,7 +939,7 @@ class _KvepavimoMeditacijaPageState extends State<KvepavimoMeditacijaPage> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+
       await _audioPlayer.setSource(AssetSource('audio/kvepavimas.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -997,7 +960,7 @@ class _KvepavimoMeditacijaPageState extends State<KvepavimoMeditacijaPage> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+     
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }
@@ -1091,12 +1054,12 @@ class _Audio1PageState extends State<Audio1Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
+
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -1104,7 +1067,7 @@ class _Audio1PageState extends State<Audio1Page> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+    
       await _audioPlayer.setSource(AssetSource('audio/stebejimas.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1125,7 +1088,7 @@ class _Audio1PageState extends State<Audio1Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+  
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }
@@ -1218,12 +1181,11 @@ class _Audio2PageState extends State<Audio2Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -1231,7 +1193,7 @@ class _Audio2PageState extends State<Audio2Page> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+
       await _audioPlayer.setSource(AssetSource('audio/judesiai.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1252,7 +1214,7 @@ class _Audio2PageState extends State<Audio2Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }
@@ -1340,12 +1302,12 @@ class _Audio3PageState extends State<Audio3Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
+  
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -1353,7 +1315,7 @@ class _Audio3PageState extends State<Audio3Page> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+
       await _audioPlayer.setSource(AssetSource('audio/kunoskenavimas.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1374,7 +1336,7 @@ class _Audio3PageState extends State<Audio3Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+   
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }
@@ -1462,12 +1424,12 @@ class _Audio4PageState extends State<Audio4Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
+
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -1475,7 +1437,7 @@ class _Audio4PageState extends State<Audio4Page> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+
       await _audioPlayer.setSource(AssetSource('audio/relaksacija.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1496,7 +1458,7 @@ class _Audio4PageState extends State<Audio4Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+   
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }
@@ -1592,12 +1554,11 @@ class _Audio5PageState extends State<Audio5Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -1605,7 +1566,7 @@ class _Audio5PageState extends State<Audio5Page> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+
       await _audioPlayer.setSource(AssetSource('audio/kalnomeditacija.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1626,7 +1587,7 @@ class _Audio5PageState extends State<Audio5Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+    
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }
@@ -1714,12 +1675,12 @@ class _Audio6PageState extends State<Audio6Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
+
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -1727,7 +1688,7 @@ class _Audio6PageState extends State<Audio6Page> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+
       await _audioPlayer.setSource(AssetSource('audio/sedejimomeditacija.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1748,7 +1709,7 @@ class _Audio6PageState extends State<Audio6Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }
@@ -1836,12 +1797,12 @@ class _Audio7PageState extends State<Audio7Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+ 
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
+
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -1849,7 +1810,7 @@ class _Audio7PageState extends State<Audio7Page> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+  
       await _audioPlayer.setSource(AssetSource('audio/pedos.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1870,7 +1831,7 @@ class _Audio7PageState extends State<Audio7Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }
@@ -1958,12 +1919,12 @@ class _Audio8PageState extends State<Audio8Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
+
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -1971,7 +1932,7 @@ class _Audio8PageState extends State<Audio8Page> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+
       await _audioPlayer.setSource(AssetSource('audio/mylintisgerumas3.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1992,7 +1953,7 @@ class _Audio8PageState extends State<Audio8Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }
@@ -2080,12 +2041,11 @@ class _Audio9PageState extends State<Audio9Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -2093,7 +2053,7 @@ class _Audio9PageState extends State<Audio9Page> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+
       await _audioPlayer.setSource(AssetSource('audio/esamojolaiko.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -2114,7 +2074,7 @@ class _Audio9PageState extends State<Audio9Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }
@@ -2202,12 +2162,12 @@ class _Audio10PageState extends State<Audio10Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-    // kai įrašas pasibaigia – atnaujinti mygtuko būseną
+
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-    // pasirenkama: neleisti loop’inti
+
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -2215,7 +2175,7 @@ class _Audio10PageState extends State<Audio10Page> {
 
   Future<void> _preload() async {
     try {
-      // ĮKELIAM šaltinį IŠ ANKSTO – taip play() veiks patikimai
+
       await _audioPlayer.setSource(AssetSource('audio/saugivieta.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -2236,7 +2196,7 @@ class _Audio10PageState extends State<Audio10Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-        // jei buvai sustabdęs iki STOP (ne pause), gali naudoti resume() / play()
+  
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
       }

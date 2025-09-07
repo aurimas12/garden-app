@@ -4,10 +4,10 @@ import '../paged_task_screen.dart' show RegisterOnNextNotification;
 typedef Gad7Submit = Future<void> Function(List<int> answers, int? total);
 
 class Gad7Page extends StatefulWidget {
-  /// Kviečiamas kaskart keičiant atsakymus (nebūtina).
+
   final ValueChanged<List<int>>? onChanged;
 
-  /// Kviečiamas, kai spaudžiam „Toliau“ (registruojama per RegisterOnNextNotification).
+
   final Gad7Submit? onSubmitted;
 
   const Gad7Page({super.key, this.onChanged, this.onSubmitted});
@@ -49,7 +49,7 @@ class _Gad7PageState extends State<Gad7Page> {
 
   @override
   Widget build(BuildContext context) {
-    // Kaip ir PHQ-9: registruojam „onNext“ po frame’o
+ 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       RegisterOnNextNotification(() async {
@@ -64,10 +64,9 @@ class _Gad7PageState extends State<Gad7Page> {
               context,
             ).showSnackBar(SnackBar(content: Text('Siuntimas nepavyko: $e')));
           }
-          // Jei nori sulaikyti perėjimą į kitą puslapį klaidos atveju:
-          // return false;
+        
         }
-        return true; // leisti „Toliau/Užbaigti“
+        return true; 
       }).dispatch(context);
     });
 

@@ -8,7 +8,6 @@ import 'package:garden_app/screens/pages/sodo_draugai_task.dart';
 
 
 List<Task> buildSodoDraugaiTasks() {
-  // 1) Kukutis
   late final Task kaipViskasVyks;
   kaipViskasVyks = Task(
     text: 'Kukutis',
@@ -34,7 +33,7 @@ List<Task> buildSodoDraugaiTasks() {
         ),
   );
 
-  // 2) Kalnas
+
   late final Task kaipViskasVyks2;
   kaipViskasVyks2 = Task(
     text: 'Kalnas',
@@ -61,7 +60,7 @@ List<Task> buildSodoDraugaiTasks() {
         ),
   );
 
-  // 3) Draugiški balsai
+
   late final Task kaipViskasVyks3;
   kaipViskasVyks3 = Task(
     text: 'Draugiški balsai',
@@ -87,7 +86,7 @@ List<Task> buildSodoDraugaiTasks() {
         ),
   );
 
-  // 4) Asertyvumas
+
   late final Task kaipViskasVyks4;
   kaipViskasVyks4 = Task(
     text: 'Asertyvumas',
@@ -113,7 +112,6 @@ List<Task> buildSodoDraugaiTasks() {
         ),
   );
 
-  // 5) Kad išgirstų
   late final Task kaipViskasVyks5;
   kaipViskasVyks5 = Task(
     text: 'Kad išgirstų',
@@ -139,7 +137,7 @@ List<Task> buildSodoDraugaiTasks() {
         ),
   );
 
-  // 6) Kad išgirsčiau
+
   late final Task kaipViskasVyks6;
   kaipViskasVyks6 = Task(
     text: 'Kad išgirsčiau',
@@ -165,7 +163,7 @@ List<Task> buildSodoDraugaiTasks() {
         ),
   );
 
-  // 7) Konfliktų sprendimas
+
   late final Task kaipViskasVyks7;
   kaipViskasVyks7 = Task(
     text: 'Konfliktų sprendimas',

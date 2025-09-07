@@ -23,8 +23,8 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
   Duration _elapsed = Duration.zero;
   Timer? _ticker;
 
-  String? _nativePath; // realus failo kelias (Android/iOS/desktop)
-  String? _webUrl; // web: blob/object URL, grįžta iš stop()
+  String? _nativePath; 
+  String? _webUrl; 
 
   DateTime? _startedAt;
 
@@ -52,7 +52,7 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
   }
 
   Future<String> _makeNativePath() async {
-    // kur išsaugosim garso failą (m4a)
+   
     final dir = await getApplicationDocumentsDirectory();
     final ts = DateTime.now().millisecondsSinceEpoch;
     return '${dir.path}/voice_$ts.m4a';
@@ -74,14 +74,14 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
       _startedAt = DateTime.now();
 
       if (kIsWeb) {
-        // Web: 'path' reikalaujamas parametras, bet bus ignoruotas
+       
         await _rec.start(
           const RecordConfig(
             encoder: AudioEncoder.opus,
             sampleRate: 48000,
             bitRate: 128000,
           ),
-          path: 'web', // privaloma nurodyti net jeigu ignoruojama web'e
+          path: 'web', 
         );
         _webUrl = null;
         _nativePath = null;
@@ -89,11 +89,11 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
         final path = await _makeNativePath();
         await _rec.start(
           const RecordConfig(
-            encoder: AudioEncoder.aacLc, // .m4a
+            encoder: AudioEncoder.aacLc, 
             sampleRate: 44100,
             bitRate: 128000,
           ),
-          path: path, // ant native privaloma ir realiai naudojama
+          path: path, 
         );
         _nativePath = path;
         _webUrl = null;
@@ -137,17 +137,17 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
       if (!_isRecording) return;
 
       final result =
-          await _rec.stop(); // String? (path ant native, blob URL ant web)
+          await _rec.stop();
       _ticker?.cancel();
 
       if (kIsWeb) {
-        _webUrl = result; // pvz. blob:… URL
+        _webUrl = result; 
         _nativePath = null;
         if (_webUrl != null) {
           await _player.setUrl(_webUrl!);
         }
       } else {
-        _nativePath = result; // failo kelias
+        _nativePath = result; 
         _webUrl = null;
         if (_nativePath != null) {
           await _player.setFilePath(_nativePath!);
@@ -204,7 +204,7 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
           ),
           const SizedBox(height: 24),
 
-          // Laikmatis
+        
           Row(
             children: [
               Icon(
@@ -224,7 +224,7 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
           ),
           const SizedBox(height: 12),
 
-          // Valdikliai
+ 
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -254,7 +254,7 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
 
           const SizedBox(height: 16),
 
-          // Perklausymas
+        
           if (hasResult) ...[
             const Divider(height: 24),
             Text(
@@ -270,36 +270,21 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
                   label: const Text('Leisti'),
                 ),
                 const SizedBox(width: 12),
-                // Flexible(
-                //   child: Text(
-                //     resultLabel,
-                //     maxLines: 2,
-                //     overflow: TextOverflow.ellipsis,
-                //     style: theme.textTheme.bodySmall,
-                //   ),
-                // ),
+         
               ],
             ),
-            // if (kIsWeb)
-            //   Padding(
-            //     padding: const EdgeInsets.only(top: 8),
-            //     child: Text(
-            //       'Pastaba: Web aplinkoje failas laikinas (blob URL). Jei reikės – vėliau pridėsim mygtuką eksportui.',
-            //       style: theme.textTheme.bodySmall,
-            //     ),
-            //   ),
+    
           ],
 
           const SizedBox(height: 24),
 
-          // Be įrašymo
+
           OutlinedButton(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Pasirinkta tęsti be įrašymo')),
               );
-              // Jei šiame PagedTaskScreen norite eiti į kitą puslapį:
-              // NextPageNotification().dispatch(context);
+
             },
             child: const Text('Tęsti be įrašymo'),
           ),

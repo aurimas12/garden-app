@@ -1,193 +1,4 @@
-// import 'package:flutter/material.dart';
-// import 'package:garden_app/screens/pages/extra_meditations.dart';
-// import '../models/task.dart';
-// import 'task_detail_screen.dart';
-// import 'results_screen.dart';
 
-// class MainScreen extends StatefulWidget {
-//   final Map<String, List<Task>> sections;
-//   const MainScreen({super.key, required this.sections});
-
-//   @override
-//   State<MainScreen> createState() => _MainScreenState();
-// }
-
-// class _MainScreenState extends State<MainScreen> {
-//   final Map<String, bool> _expandedSections = {};
-//   final List<String> _sectionOrder = [];
-//   int _currentIndex = 0;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _sectionOrder.addAll(widget.sections.keys);
-//     for (var s in _sectionOrder) {
-//       _expandedSections[s] = false;
-//     }
-//   }
-
-//   void _toggleSection(String section) {
-//     setState(() => _expandedSections[section] = !_expandedSections[section]!);
-//   }
-
-//   bool _isSectionLocked(String sectionTitle) {
-//     final i = _sectionOrder.indexOf(sectionTitle);
-//     if (i == 0) return false;
-//     final prevTasks = widget.sections[_sectionOrder[i - 1]]!;
-//     return prevTasks.any((t) => !t.done);
-//   }
-
-//   void _markTaskComplete(Task task, String? mood) {
-//     setState(() {
-//       task.done = true;
-//       task.mood = mood;
-//     });
-//   }
-
-//   Widget _buildSection(String title, List<Task> tasks) {
-//     final isExpanded = _expandedSections[title]!;
-//     final completed = tasks.where((t) => t.done).length;
-//     final isLocked = false;
-//     // final isLocked = _isSectionLocked(title);
-
-//     return Opacity(
-//       opacity: isLocked ? 0.4 : 1.0,
-//       child: Padding(
-//         padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
-//         child: GestureDetector(
-//           onTap: isLocked ? null : () => _toggleSection(title),
-//           child: Container(
-//             decoration: BoxDecoration(
-//               color: const Color(0xFFD9EDDD),
-//               borderRadius: BorderRadius.circular(12),
-//               boxShadow: [
-//                 BoxShadow(
-//                   color: Colors.grey.withOpacity(0.3),
-//                   blurRadius: 4,
-//                   offset: const Offset(0, 2),
-//                 ),
-//               ],
-//             ),
-//             child: Column(
-//               children: [
-//                 ListTile(
-//                   leading: Icon(Icons.nature, color: Colors.green[700]),
-//                   title: Text(title, style: const TextStyle(fontSize: 18)),
-//                   trailing: const Icon(Icons.expand_more),
-//                 ),
-//                 if (isExpanded && !isLocked)
-//                   Column(
-//                     children: [
-//                       ...tasks.map(
-//                         (task) => ListTile(
-//                           leading: Icon(
-//                             task.done
-//                                 ? Icons.check_circle
-//                                 : Icons.radio_button_unchecked,
-//                             color: task.done ? Colors.green : Colors.grey,
-//                           ),
-//                           title: Text(task.text),
-
-//                           onTap: () {
-//                             if (task.screenBuilder != null) {
-//                               final screen = task.screenBuilder!.call(() {
-//                                 setState(() {
-//                                   task.done = true;
-//                                 });
-//                               });
-//                               Navigator.push(
-//                                 context,
-//                                 MaterialPageRoute(builder: (_) => screen),
-//                               );
-//                             } else {
-//                               Navigator.push(
-//                                 context,
-//                                 MaterialPageRoute(
-//                                   builder:
-//                                       (_) => TaskDetailScreen(
-//                                         task: task,
-//                                         onComplete: (m) {
-//                                           setState(() {
-//                                             task.done = true;
-//                                             task.mood = m;
-//                                           });
-//                                         },
-//                                       ),
-//                                 ),
-//                               );
-//                             }
-//                           },
-//                         ),
-//                       ),
-//                       Padding(
-//                         padding: const EdgeInsets.only(
-//                           left: 16,
-//                           right: 16,
-//                           bottom: 16,
-//                         ),
-//                         child: Column(
-//                           crossAxisAlignment: CrossAxisAlignment.start,
-//                           children: [
-//                             Text('$completed iš ${tasks.length} atlikta'),
-//                             const SizedBox(height: 4),
-//                             LinearProgressIndicator(
-//                               value:
-//                                   tasks.isNotEmpty
-//                                       ? completed / tasks.length
-//                                       : 0,
-//                               backgroundColor: Colors.grey[300],
-//                               color: Colors.green,
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final body =
-//         _currentIndex == 0
-//             ? ListView(
-//               children:
-//                   widget.sections.entries
-//                       .map((e) => _buildSection(e.key, e.value))
-//                       .toList(),
-//             )
-//             : _currentIndex == 1
-//             ? ResultsScreen(sections: widget.sections)
-//             // : const Center(child: Text('Nustatymai netrukus...'));
-//             : const ExtraMeditationsPage();
-
-//     return Scaffold(
-//       backgroundColor: const Color(0xFFF9FCF9),
-//       appBar: AppBar(
-//         title: const Text('Mano sodas'),
-//         backgroundColor: Colors.green,
-//       ),
-//       body: body,
-//       bottomNavigationBar: BottomNavigationBar(
-//         currentIndex: _currentIndex,
-//         onTap: (i) => setState(() => _currentIndex = i),
-//         backgroundColor: const Color(0xFFF9FCF9),
-//         selectedItemColor: Colors.green[800],
-//         unselectedItemColor: Colors.grey,
-//         items: const [
-//           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Priminimai'),
-//           BottomNavigationBarItem(icon: Icon(Icons.check), label: 'Rezultatai'),
-//           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Extra'),
-//         ],
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:garden_app/screens/pages/extra_meditations.dart';
 import '../models/task.dart';
@@ -207,7 +18,6 @@ class _MainScreenState extends State<MainScreen> {
   final List<String> _sectionOrder = [];
   int _currentIndex = 0;
 
-  // Sekcijų banerių paveikslėliai (asset keliai)
   static const _sectionImages = {
     'Pasiruošimas': 'assets/sections/1.png',
     'Minčių sėjimas': 'assets/sections/2.png',
@@ -265,11 +75,11 @@ class _MainScreenState extends State<MainScreen> {
       child: ClipRRect(
         borderRadius: radius,
         child: SizedBox(
-          height: 120, // 👈 mažas, kompaktiškas baneris
+          height: 120,
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // paveikslėlis
+    
               Image.asset(
                 imageAsset,
                 fit: BoxFit.cover,
@@ -285,7 +95,7 @@ class _MainScreenState extends State<MainScreen> {
                     ),
               ),
 
-              // gradientas (lengvas, kad matytųsi vaizdas)
+     
               Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -300,7 +110,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
 
-              // tekstai + „toggle“ rodyklė apačioje
+
               Positioned(
                 left: 12,
                 right: 12,
@@ -347,7 +157,6 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
 
-              // plona progreso juosta apačioje
               Positioned(
                 left: 0,
                 right: 0,
@@ -360,7 +169,7 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
 
-              // užrakintas overlay (jei naudoji „lock“ logiką)
+
               if (isLocked)
                 Positioned.fill(
                   child: Container(
@@ -390,8 +199,6 @@ class _MainScreenState extends State<MainScreen> {
     final isExpanded = _expandedSections[title]!;
     final completed = tasks.where((t) => t.done).length;
 
-    // jei nori aktyvuoti užrakinimą – naudok:
-    // final isLocked = _isSectionLocked(title);
     final isLocked = false;
 
     final imageAsset =
@@ -426,7 +233,7 @@ class _MainScreenState extends State<MainScreen> {
                 onTap: () => _toggleSection(title),
               ),
 
-              // turinys (užduočių sąrašas), rodom tik jei išskleista ir ne lock
+
               if (isExpanded && !isLocked)
                 Container(
                   width: double.infinity,
@@ -486,7 +293,7 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ),
                       ),
-                      // papildomas apatinis progreso tekstas
+     
                       Padding(
                         padding: const EdgeInsets.only(top: 6),
                         child: Row(
@@ -561,7 +368,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-// Mažas tekstų blokas banerio apačioje
 class _BannerTextBlock extends StatelessWidget {
   final String title;
   final String? subtitle;

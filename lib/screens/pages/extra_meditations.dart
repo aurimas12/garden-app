@@ -12,11 +12,11 @@ class ExtraMeditationsPage extends StatefulWidget {
 
 class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
   final _player = AudioPlayer();
-  int? _currentIndex; // kuris takelis aktyvus
-  String? _lastError; // diagnostika
-  bool _assetsOk = false; // ar visi assets yra Manifest'e
+  int? _currentIndex; 
+  String? _lastError; 
+  bool _assetsOk = false;
 
-  // 5 įrašai iš assets/audio/
+
   final _tracks = const [
     _Track(
       fileName: 'kvepavimas.mp3',
@@ -59,7 +59,7 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
   }
 
   void _wirePlayerEvents() {
-    // kai takelis baigiasi – sustabdom ir nuimame aktyvą
+
     _player.playerStateStream.listen(
       (state) {
         if (state.processingState == ProcessingState.completed) {
@@ -107,7 +107,7 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
     }
   }
 
-  // ---- Valdikliai: PLAY/PAUSE/STOP ----
+ 
 
   Future<void> _playIndex(int index) async {
     final assetPath = 'assets/audio/${_tracks[index].fileName}';
@@ -147,8 +147,8 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
 
   Future<void> _stop() async {
     try {
-      await _player.stop(); // sustabdo ir resetina poziciją
-      _currentIndex = null; // nuimame aktyvų takelį
+      await _player.stop(); 
+      _currentIndex = null; 
       setState(() {});
     } catch (e) {
       setState(() => _lastError = 'Stop klaida: $e');
@@ -209,13 +209,13 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
               final isThis = _currentIndex == index;
               final isPlaying = isThis && _player.playing;
 
-              // Pagrindinis mygtukas: rodo PLAY arba PAUSE, bet mygtukas visuomet yra
+              
               final IconData mainIcon =
                   isPlaying ? Icons.pause_circle : Icons.play_circle_fill;
               final VoidCallback mainHandler =
                   isPlaying ? () => _pause() : () => _playIndex(index);
 
-              // STOP matomas VISADA; neaktyviems – išjungtas
+          
               final bool canStop = isThis;
 
               return Container(
@@ -238,7 +238,7 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Pavadinimas + Play/Pause + Stop (abu VISADA matomi)
+                 
                       Row(
                         children: [
                           Expanded(
@@ -267,7 +267,7 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
                         ],
                       ),
 
-                      // Progresas rodomas tik aktyviam takeliui
+                
                       if (isThis) ...[
                         const SizedBox(height: 4),
                         StreamBuilder<Duration?>(
@@ -321,7 +321,7 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
                         const SizedBox(height: 4),
                       ],
 
-                      // Antra eilutė (ID)
+               
                       Text(
                         track.prettyId,
                         style: theme.textTheme.bodySmall?.copyWith(
@@ -341,9 +341,9 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
 }
 
 class _Track {
-  final String fileName; // assets/audio/<fileName>
-  final String title; // rodomas pavadinimas
-  final String prettyId; // papildoma eilutė
+  final String fileName; 
+  final String title; 
+  final String prettyId; 
   const _Track({
     required this.fileName,
     required this.title,

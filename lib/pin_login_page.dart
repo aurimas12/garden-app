@@ -1,4 +1,3 @@
-// lib/screens/pin_login_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../services/api.dart';
@@ -92,7 +91,7 @@ class _PinLoginPageState extends State<PinLoginPage> {
                       border: const OutlineInputBorder(),
                     ),
                     onChanged:
-                        (_) => setState(() {}), // atnaujins mygtuko enabled
+                        (_) => setState(() {}), 
                     onSubmitted: (_) {
                       if (canSubmit) _doLogin();
                     },

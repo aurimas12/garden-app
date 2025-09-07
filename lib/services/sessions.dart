@@ -4,15 +4,15 @@ class Session {
   static const _kAccountIdKey = 'account_id';
   static const _kPinKey = 'pin_str'; // PIN saugom kaip tekstą
 
-  /// Paleisk startuojant – susitvarko bet kokį seną įrašą (int ar kitas raktas).
+
   static Future<void> fixLegacy() async {
     final sp = await SharedPreferences.getInstance();
 
-    // jei jau turim teisingą string PIN – viskas ok
+
     final curr = sp.getString(_kPinKey);
     if (curr != null) return;
 
-    // 1) gal kažkada įrašė kaip int po tuo pačiu raktu
+
     final iNow = sp.getInt(_kPinKey);
     if (iNow != null) {
       final pin = iNow.toString().padLeft(6, '0');
@@ -21,7 +21,7 @@ class Session {
       return;
     }
 
-    // 2) gal seniau buvo naudotas raktas 'pin'
+
     final legacyS = sp.getString('pin');
     if (legacyS != null) {
       await sp.setString(_kPinKey, legacyS);

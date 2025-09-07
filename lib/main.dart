@@ -1,4 +1,3 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 
 import 'package:garden_app/data/demesingas_laistymas.dart';
@@ -13,14 +12,12 @@ import 'package:garden_app/services/sessions.dart';
 import 'data/pasiruosimas_task.dart';
 
 import 'models/task.dart';
-import 'screens/main_screen.dart'; // tavo PIN ekranas
-// import 'data/session.dart';            // SharedPreferences helperis
+import 'screens/main_screen.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // await Session.migratePrefs();
-  // Paruošiam sekcijas kaip ir anksčiau
   final sections = <String, List<Task>>{
     'Pasiruošimas': buildPasiruosimasTasks(),
     'Minčių sėjimas': buildMinciuSejimasTasks(),
@@ -32,8 +29,8 @@ Future<void> main() async {
     'Puoselėjimas': buildPuoselejimasTasks(),
   };
 
-  await Session.fixLegacy(); // 👈 svarbu
-  // Patikrinam ar jau prisijungta (yra account_id)
+  await Session.fixLegacy(); 
+
   final accountId = await Session.getAccountId();
   final isLoggedIn = accountId != null;
 
@@ -50,7 +47,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sodas',
       theme: ThemeData(primarySwatch: Colors.green),
-      // Jei prisijungta – rodom pagrindinį, jei ne – PIN puslapį
+   
       home:
           isLoggedIn
               ? MainScreen(sections: sections)

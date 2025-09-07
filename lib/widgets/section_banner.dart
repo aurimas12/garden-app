@@ -28,13 +28,13 @@ class SectionBanner extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            // Paveikslėlis
+
             AspectRatio(
               aspectRatio: 16 / 9,
               child: Image.asset(
                 imageAsset,
                 fit: BoxFit.cover,
-                // fallback, jei asset nerastas
+            
                 errorBuilder:
                     (_, __, ___) => Container(
                       color: const Color(0xFFE9F5EC),
