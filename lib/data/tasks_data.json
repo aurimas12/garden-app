@@ -1,0 +1,46 @@
+[
+  {
+    "title": "Pasiruošimas",
+    "icon": "0xe869",
+    "enabled": true,
+    "subItems": [
+      {
+        "text": "Įrankių paruošimas",
+        "description": "Paruošk visus reikalingus įrankius.",
+        "done": false
+      },
+      {
+        "text": "Planavimas",
+        "description": "Susiplanuok darbus ir laiką.",
+        "done": false
+      },
+      {
+        "text": "Tikslų nustatymas",
+        "description": "Nustatyk aiškius tikslus, ką pasiekti.",
+        "done": false
+      }
+    ]
+  },
+  {
+    "title": "Minčių sėjimas",
+    "icon": "0xe41a",
+    "enabled": false,
+    "subItems": [
+      {
+        "text": "Pozityvios mintys",
+        "description": "Skirk laiko pozityvių minčių ugdymui.",
+        "done": false
+      },
+      {
+        "text": "Meditacija",
+        "description": "Trumpa meditacija nuraminimui ir susikaupimui.",
+        "done": false
+      },
+      {
+        "text": "Žurnalizavimas",
+        "description": "Užrašyk savo mintis dienoraštyje.",
+        "done": false
+      }
+    ]
+  }
+]
