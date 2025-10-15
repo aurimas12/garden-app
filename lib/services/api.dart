@@ -5,8 +5,9 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
 String get _baseUrl {
-  if (kIsWeb)
+  if (kIsWeb) {
     return 'https://garden-api-o3yq.onrender.com'; // Flutter Web per Chrome
+  }
   if (Platform.isAndroid) return 'http://10.0.2.2:8000'; // Android emulatorius
   return 'http://127.0.0.1:8000'; // iOS sim / desktop
 }
