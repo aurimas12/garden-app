@@ -1746,7 +1746,7 @@ class EmociniuPokyciuRezultataiBlock extends StatelessWidget {
     required this.savijautaDabar,
     required this.atsistatymasBuvo,
     required this.atsistatymasDabar,
-    required this.perdegimoPokytisText, /
+    required this.perdegimoPokytisText, 
   });
 
   final int depresijaBuvo; 
