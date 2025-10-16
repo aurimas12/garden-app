@@ -14,7 +14,7 @@ String get _baseUrl {
 
 class AuthApi {
   static Future<int> loginPin(String pin) async {
-    final uri = Uri.parse('$_baseUrl/api/users/login/');
+    final uri = Uri.parse('$_baseUrl/api/users/login/pin/');
     try {
       final res = await http
           .post(
