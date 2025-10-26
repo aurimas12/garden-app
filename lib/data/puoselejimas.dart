@@ -3,6 +3,7 @@ import 'package:garden_app/screens/mood_emoji_page.dart';
 import 'package:garden_app/screens/paged_task_screen.dart';
 import 'package:garden_app/screens/pages/jegu_atstatymas.dart';
 import 'package:garden_app/screens/pages/puoselejimas_task.dart';
+import 'package:garden_app/screens/pages/text_page.dart';
 
 
 List<Task> buildPuoselejimasTasks() {
@@ -115,35 +116,41 @@ List<Task> buildPuoselejimasTasks() {
 
   late final Task kaipViskasVyks5;
   kaipViskasVyks5 = Task(
-    text: 'Skalės',
+    text: 'Apibendrinimas',
     screenBuilder:
         (onFinish) => PagedTaskScreen(
-          title: 'Skalės',
+          title: 'Apibendrinimas',
           onFinish: () {
             kaipViskasVyks5.done = true;
             onFinish();
           },
           pages: [
-            MoodEmojiPage(
-              onChanged: (emoji) {
-                kaipViskasVyks5.mood = emoji;
-                kaipViskasVyks5.done = true;
-              },
-            ),
-            AllScalesBlock(),
-            SavijautosKlausimynasBlock(),
-            EmociniuPokyciuRezultataiBlock(
-              depresijaBuvo: 12,
-              depresijaDabar: 6,
-              nerimasBuvo: 14,
-              nerimasDabar: 8,
-              savijautaBuvo: 10,
-              savijautaDabar: 18,
-              atsistatymasBuvo: 28,
-              atsistatymasDabar: 42,
-              perdegimoPokytisText: 'sumažėjo',
-            ),
-            UzpildytosSkalesBlock(),
+            // MoodEmojiPage(
+
+            //   onChanged: (emoji) {
+            //     kaipViskasVyks5.mood = emoji;
+            //     kaipViskasVyks5.done = true;
+            //   },
+            // ),
+            // AllScalesBlock(),
+            // SavijautosKlausimynasBlock(),
+            // EmociniuPokyciuRezultataiBlock(
+            //   depresijaBuvo: 12,
+            //   depresijaDabar: 6,
+            //   nerimasBuvo: 14,
+            //   nerimasDabar: 8,
+            //   savijautaBuvo: 10,
+            //   savijautaDabar: 18,
+            //   atsistatymasBuvo: 28,
+            //   atsistatymasDabar: 42,
+            //   perdegimoPokytisText: 'sumažėjo',
+            // ),
+            // UzpildytosSkalesBlock(),
+
+            TextPage1('Noriu paklausti, kaip tau ši Sodo programa? Gal gali apibendrinti, kiek pavyko įsitraukti, kokius pozityvius dalykus išsineši?'),
+            TextPage1('Prašau, įrašyk žemiau arba pasakyk sau balsu, kaip įsipareigoji toliau savimi rūpintis?'),
+            TextPage1('Siunčiu virtualų apkabinimą! Jeigu nori, gali apkabinti save!'),
+            TextPage1('Ačiū Tau, ka rūpiniesi savimi! Susitikime rytoj.'),
           ],
         ),
   );

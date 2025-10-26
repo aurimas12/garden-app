@@ -16,7 +16,6 @@ import '../models/task.dart';
 import '../screens/paged_task_screen.dart';
 import '../screens/pages/text_page.dart';
 
-
 typedef EmojiPageBuilder = Widget Function(ValueChanged<String> onChanged);
 
 Task makeTaskWithMood({
@@ -41,13 +40,10 @@ Task makeTaskWithMood({
             onFinish();
           },
           pages: [
-  
             (emojiBuilder ?? defaultEmoji)((emoji) async {
-   
               t.mood = emoji;
               if (markDoneOnPick) t.done = true;
 
- 
               try {
                 final prefs = await SharedPreferences.getInstance();
                 final id = prefs.getInt('account_id');
@@ -55,7 +51,7 @@ Task makeTaskWithMood({
                   await EmojiApi.save(
                     accountId: id,
                     emoji: emoji,
-                    taskCode: title, 
+                    taskCode: title,
                   );
                 }
               } catch (e) {
@@ -71,9 +67,7 @@ Task makeTaskWithMood({
   return t;
 }
 
-
 List<Task> buildPasiruosimasTasks() {
-
   final kaipViskasVyks = makeTaskWithMood(
     title: 'Kaip viskas vyks',
     pages: const [
@@ -110,107 +104,156 @@ List<Task> buildPasiruosimasTasks() {
     ],
   );
 
-
   final nuotaika = makeTaskWithMood(
-    title: 'Nuotaika',
+    title: 'Motyvacija',
 
     markDoneOnPick: true,
     pages: [
       TextPage1(
-        'Kviečiu užpildyti pirmas skales apie emocinę savijautą. '
-        'Čia rasi dvi trumpas skales, kurios skirtos nuotaikai įvertinti. '
-        'Kai užpildysi ir paspausi „Atlikta“ – pamatysi rezultatų įverčius, '
-        'juos vėliau galėsi rasti skiltyje „Rezultatai“.',
+        'Kviečiu pirmai savirefleksijai. Noriu užduoti Tau kelis klausimus.',
+      ),
+      TextPage1(
+        'Kodėl pasirinkai dalyvauti tyrime, susijusiame su emocinės sveikatos puoselėjimu ir gerinimu? Ko tikiesi iš šios programos? Gali užrašyti.',
+      ),
+      TextPage1(
+        'Kaip norėtum pagerinti savo emocinę savijautą? Jeigu reikėtų išsikelti du svarbiausius tikslus, susijusius su Tavo emocinės savijautos gerove, kokie jie būtų? (Pavyzdžiai: sumažėjęs nerimas, pagerėjęs miegas, geresni santykiai su kolegomis, mažesnis vienišumo jausmas, geriau valdomas pyktis, didesnis lengvumo pojūtis darbe ir t.t.).',
+      ),
+      TextPage1(
+        'Tikiuosi, kad ši Sodo programa padės Tau siekti Tavo emocinės savijautos gerėjimo tikslų, čia rasi įvairių įrankių, kurie padės Tau jaustis geriau. Taip pat viliuosi, kad kai bus sunku rasti laiko ar nesinorės ateiti į šį Sodą – vis tiek ateisi, nes turėsi aiškiai įvardintas priežastis ir tikslus kodėl tai darai.Iki susitikimo rytoj! Lauksiu Tavęs! :) ',
       ),
 
       // Phq9Page(),
       // Gad7Page(),
-      Phq9Page(
-        onSubmitted: (answers, total) async {
-          final id = await Session.getAccountId();
-          if (id == null) return;
-          await QuestionnaireApi.submit(
-            accountId: id,
-            kind: 'phq9',
-            answers: answers,
-            total: total,
-            taskCode: 'Nuotaika',
-          );
-        },
-      ),
+      // Phq9Page(
+      //   onSubmitted: (answers, total) async {
+      //     final id = await Session.getAccountId();
+      //     if (id == null) return;
+      //     await QuestionnaireApi.submit(
+      //       accountId: id,
+      //       kind: 'phq9',
+      //       answers: answers,
+      //       total: total,
+      //       taskCode: 'Nuotaika',
+      //     );
+      //   },
+      // ),
 
-      Gad7Page(
-        onSubmitted: (answers, total) async {
-          final id = await Session.getAccountId();
-          if (id == null) return;
-          await QuestionnaireApi.submit(
-            accountId: id,
-            kind: 'gad7',
-            answers: answers,
-            total: total,
-            taskCode: 'Nuotaika',
-          );
-        },
-      ),
-      TextPage1(
-        'Žemiau matysi skalių rezultatus, jos labiausiai vertina depresijos (PHQ-9) '
-        'ir nerimo (GAD-7) simptomus. Žiūrėk į rezultatus kritiškai – skalės padeda '
-        'suprasti situaciją, tačiau jos nėra diagnozė.\n\n'
-        'Jei balai aukšti ir jauti, kad simptomai apsunkina kasdienę veiklą, '
-        'santykius ar kelia nuolatinę kančią – verta pasitarti su specialistu.\n\n'
-        'Užpildei visas šiandien numatytas skales, puiku! Lauksiu Tavęs rytoj.',
-      ),
+      // Gad7Page(
+      //   onSubmitted: (answers, total) async {
+      //     final id = await Session.getAccountId();
+      //     if (id == null) return;
+      //     await QuestionnaireApi.submit(
+      //       accountId: id,
+      //       kind: 'gad7',
+      //       answers: answers,
+      //       total: total,
+      //       taskCode: 'Nuotaika',
+      //     );
+      //   },
+      // ),
+      // TextPage1(
+      //   'Žemiau matysi skalių rezultatus, jos labiausiai vertina depresijos (PHQ-9) '
+      //   'ir nerimo (GAD-7) simptomus. Žiūrėk į rezultatus kritiškai – skalės padeda '
+      //   'suprasti situaciją, tačiau jos nėra diagnozė.\n\n'
+      //   'Jei balai aukšti ir jauti, kad simptomai apsunkina kasdienę veiklą, '
+      //   'santykius ar kelia nuolatinę kančią – verta pasitarti su specialistu.\n\n'
+      //   'Užpildei visas šiandien numatytas skales, puiku! Lauksiu Tavęs rytoj.',
+      // ),
     ],
   );
 
- 
   final profesine = makeTaskWithMood(
-    title: 'Profesinė savijauta',
+    title: 'Dabartinė situacija',
 
     pages: [
-      ProfRoleSelectPage(),
-      ProfMaslachScalePart(from: 1, to: 10),
-      ProfMaslachScalePart(from: 11, to: 22),
-      ProfEndPage(),
+      // ProfRoleSelectPage(),
+      // ProfMaslachScalePart(from: 1, to: 10),
+      // ProfMaslachScalePart(from: 11, to: 22),
+      // ProfEndPage(),
+      TextPage1(
+        'Šiandien kviesiu šiek tiek pareflektuoti apie dabartinę Tavo situaciją.',
+      ),
+      TextPage1(
+        'Noriu paklausti, kokie yra dabartiniai didžiausią stresą keliantys Tau dalykai?Jeigu gali, apibūdink juos sau kuo konkrečiau. Prašau ne tik įvardinti sritį – darbas, šeima, sveikata ar kt., bet apibūdinti kuo konkrečiau, pavyzdžiui:„Didžiausią stresą kelia konfliktai su kolege A”; „Neturiu laiko atauti jėgas, nuolat galvoju apie darbą arba reikia rūpintis šeimos reikalais”;„Jaučiu labai daug atsakomybės už pacientus, bijau klysti”;„Nerimauju dėl savo sveikatos, bijau, kas bus, jeigu liga progresuos”.',
+      ),
+      TextPage1(
+        'O kokius būdus naudoji tvarkytis su stresais? Kokie būdai tau padeda atgauti jėgas, nurimti, jausti daugiau energijos?Įrašyk.',
+      ),
+      TextPage1(
+        'Tikiuosi, kad Sodo programoje rasi psichologinių įrankių, kurie padės tvarkytis ir su didžiausiais stresais Tavo gyvenime! Iki susitikimo.',
+      ),
+      // TextPage1('text'),
     ],
   );
 
-
   final savybes = makeTaskWithMood(
-    title: 'Savybės',
+    title: 'Kai nebus motyvacijos',
     // emojiBuilder: (onChanged) => SavybesMoodEmojiPage(onChanged: onChanged),
     pages: const [
-      SavybesIntroPage(),
-      BigFiveScalePage(),
-      SavybesResultsInfoPage(),
-      SavybesEndPage(),
+      // SavybesIntroPage(),
+      // BigFiveScalePage(),
+      // SavybesResultsInfoPage(),
+      // SavybesEndPage(),
+      TextPage1(
+        'Pasiruošimo Sodo programai metu labai svarbu apgalvoti, ką daryti, kai nebus motyvacijos.',
+      ),
+      TextPage1(
+        'Motyvacija yra gan sudėtingas fenomenas…Kaip manai, kas būtent Tave motyvuoja daryti dalykus?Galbūt noras saugumo, baimė, noras patirti malonias emocijas ar sumažinti nemalonias, išvengti katastrofų, rūpestis savimi? Skirk kelias minutes ir pagalvok apie Tave motyvuojančius veiksnius.',
+      ),
+      TextPage1(
+        'Būna taip, kad žinome, ko norime, bet vis tiek sunku tai daryti dėl nesusiformavusių įpročių. Pavyzdžiui, žinome, kad daržovės - sveika, bet nevalgome jų daugiau, ens nespėjame, neprisimename, teikiame prioritetą kažkam kitam. Tad noriu pakviesti tave pasvarstyti, o kaip sau priminsi dalyvauti šioje Sodo programoje? Kartais per darbų šūsnį gali tiesiog pamiršti paspausti programėlės ikonėlę ar nenorėti prisijungti. Galbūt gali užsirašyti priminimus ar nusistatyti žadintuvą, kuris kiekvieną dieną primintų prisijungti? Galbūt  tiesiog vertybės išsigryninimas (pavyzdžiui, emocinė sveikata) padės Tau? Gal yra dar kokių būdų, kurie padėtų nuosekliai, kiekvieną dieną prisijungti prie šios programos ir formuoti įpročius? Skirk keletą minučių pagalvoti apie tai.',
+      ),
+      TextPage1(
+        'Jeigu manai, kad naudinga, tai kviečiu tiesiog dabar paimti ir nusistatyti žadintuvą, kuris skambės kiekvieną dieną Tau patogiu metu ir taip primins įsijungti programėlę. :) Bet, kaip norisi, gal turi savo būdą! Iki rytojaus! :)',
+      ),
+      // TextPage1('text'),
     ],
   );
 
   // 5) Jėgų atstatymas
   final jegu = makeTaskWithMood(
-    title: 'Jėgų atstatymas',
+    title: 'Trumpa praktika',
     // emojiBuilder: (onChanged) => JeguMoodEmojiPage(onChanged: onChanged),
     pages: const [
-      SavijautosScalePage(),
-      RecoveryExperiencePage(),
-      JeguResultsInfoPage1(savijautaScore: 12, recoveryScore: 30),
-      JeguEndPage(),
+      // SavijautosScalePage(),
+      // RecoveryExperiencePage(),
+      // JeguResultsInfoPage1(savijautaScore: 12, recoveryScore: 30),
+      // JeguEndPage(),
+      TextPage1(
+        'Kaip minėjau, kartais kviesiu tam tikroms praktikoms čia ir dabar. Noriu pakviesti nesudėtingai ir minimaliai laiko užimančiai praktikai.',
+      ),
+      TextPage1(
+        'Kviečiu tave pastebėti savo kūną. Kuriose kūno dalyse jauti daugiausiai įtampos? Gal gali dabar švelniai pajudėti? Jei gali, pasukio dabar riešus, pėdas ir galvą.',
+      ),
+      TextPage1(
+        'Jeigu jautiesi patogiai - pabandyk atsistoti ir tarsi nusipurtyti įtampą. Jeigu turi daugiau laiko - gali pajudinti pečius, liemenį, pratempti tas vietas, kur jauti daugiausiai įtampos.',
+      ),
+      TextPage1(
+        'Kviečiu kasdien karts nuo karto pastebėti, kiek įsitempęs Tavo kūnas ir sąmoningai kažkiek atpalaiduoti kūną. Iki kito susitikimo :)',
+      ),
     ],
   );
-
 
   final apieTaveTask = makeTaskWithMood(
-    title: 'Šiek tiek apie Tave',
+    title: 'Nemalonios emocijos',
     // emojiBuilder: (onChanged) => ProfMoodEmojiPage(onChanged: onChanged),
     pages: const [
-      ProfRoleSelectPage(),
-      klausimynas1(),
-      PsichologinisKlausimynasPage(),
-      apie1(),
+      // ProfRoleSelectPage(),
+      // klausimynas1(),
+      // PsichologinisKlausimynasPage(),
+      // apie1(),
+      TextPage1(
+        'Įdomu, kaip tu reaguoji, ką dažniausiai darai ar kaip būni su nemaloniomis emocijomis? Gal gali kelias akimirkas apie tai pagalvoti.',
+      ),
+      TextPage1(
+        'Noriu tik pasakyti, kad gali būti taip, jog sodininkaujant, atliekant praktikas šiame Sode - patirsi nemalonių emocijų. Kviečiu jų neišsigąsti, nepradėti vengti praktikų, bet tiesiog priimti kaip yra ir tęsti.',
+      ),
+      TextPage1(
+        'Tikiuosi, kad po šios Sodo programos patirsi daugiau lengvumo, kad ir kokios emocijos,mintys ar situacijos užkluptų.',
+      ),
+      TextPage1('Liko tik viena pasiruošimo užduotis ir keliausime toliau :)'),
     ],
   );
-
 
   final sodoFantazija = makeTaskWithMood(
     title: 'Sodo fantazija',
