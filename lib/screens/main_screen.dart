@@ -1,4 +1,3 @@
-
 // import 'package:flutter/material.dart';
 // import 'package:garden_app/screens/pages/extra_meditations.dart';
 // import '../models/task.dart';
@@ -9,7 +8,7 @@
 //   final Map<String, List<Task>> sections;
 
 //   const MainScreen({super.key, required this.sections, required int accountId});
-  
+
 //   @override
 //   State<MainScreen> createState() => _MainScreenState();
 // }
@@ -80,7 +79,7 @@
 //           child: Stack(
 //             fit: StackFit.expand,
 //             children: [
-    
+
 //               Image.asset(
 //                 imageAsset,
 //                 fit: BoxFit.cover,
@@ -96,7 +95,6 @@
 //                     ),
 //               ),
 
-     
 //               Container(
 //                 decoration: BoxDecoration(
 //                   gradient: LinearGradient(
@@ -110,7 +108,6 @@
 //                   ),
 //                 ),
 //               ),
-
 
 //               Positioned(
 //                 left: 12,
@@ -169,7 +166,6 @@
 //                   color: Colors.lightGreenAccent,
 //                 ),
 //               ),
-
 
 //               if (isLocked)
 //                 Positioned.fill(
@@ -234,7 +230,6 @@
 //                 onTap: () => _toggleSection(title),
 //               ),
 
-
 //               if (isExpanded && !isLocked)
 //                 Container(
 //                   width: double.infinity,
@@ -294,7 +289,7 @@
 //                           ),
 //                         ),
 //                       ),
-     
+
 //                       Padding(
 //                         padding: const EdgeInsets.only(top: 6),
 //                         child: Row(
@@ -369,7 +364,6 @@
 //   }
 // }
 
-
 import 'package:flutter/material.dart';
 import 'package:garden_app/screens/pages/extra_meditations.dart';
 import 'package:garden_app/task_utils.dart';
@@ -378,7 +372,7 @@ import 'task_detail_screen.dart';
 import 'results_screen.dart';
 // NAUJI IMPORTAI:
 import '../services/week_access_service.dart'; // Savaitės prieinamumo servisas
-import '../task_utils.dart';             // SECTION_TO_WEEK_MAP (Žemėlapis)
+import '../task_utils.dart'; // SECTION_TO_WEEK_MAP (Žemėlapis)
 
 class MainScreen extends StatefulWidget {
   final Map<String, List<Task>> sections;
@@ -386,9 +380,9 @@ class MainScreen extends StatefulWidget {
 
   // Atnaujintas konstruktorius
   const MainScreen({
-    super.key, 
-    required this.sections, 
-    required this.currentAccountId
+    super.key,
+    required this.sections,
+    required this.currentAccountId,
   });
 
   @override
@@ -465,7 +459,6 @@ class _MainScreenState extends State<MainScreen> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-    
               Image.asset(
                 imageAsset,
                 fit: BoxFit.cover,
@@ -494,7 +487,6 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 ),
               ),
-
 
               Positioned(
                 left: 12,
@@ -554,12 +546,13 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
 
-
               // VIZUALINIS UŽRAKINIMAS
               if (isLocked)
                 Positioned.fill(
                   child: Container(
-                    color: Colors.black.withOpacity(0.45), // Pilkumas/blokavimas
+                    color: Colors.black.withOpacity(
+                      0.45,
+                    ), // Pilkumas/blokavimas
                     alignment: Alignment.center,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -568,11 +561,11 @@ class _MainScreenState extends State<MainScreen> {
                         const SizedBox(width: 8),
                         Text(
                           // NAUJAS PRANEŠIMAS: Laikas turi didesnį prioritetą
-                          isTimeLocked 
+                          isTimeLocked
                               ? 'Bus atidaryta, kai praeis laikas' // <-- LAIKO UŽRAKINIMAS
                               : 'Atrakinsite užbaigę ankstesnę savaitę', // <-- UŽBAIGIMO UŽRAKINIMAS
                           style: const TextStyle(
-                            color: Colors.white, 
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -587,122 +580,259 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // NAUJAS METODAS SU FUTUREBUILDER
   Widget _buildSection(String title, List<Task> tasks) {
-    
     // Gauname savaitės numerį (pvz., 'Minčių sėjimas' -> 2)
     final weekNumber = SECTION_TO_WEEK_MAP[title] ?? 99;
-    
+
     // SENA LOGIKA: Užrakinimas dėl neužbaigtos praeitos savaitės
     final isCompletionLocked = _isSectionLockedByCompletion(title);
 
     // Kviečiame API tikrinti laiko užrakinimą
     return FutureBuilder<bool>(
-        future: WeekAccessService.isWeekAvailable(widget.currentAccountId, weekNumber), 
-        builder: (context, snapshot) {
-            
-            // isTimeLocked: Ar savaitė jau atidaryta pagal API (duomenys gauti, bet False)
-            // Laukimo metu (ConnectionState.waiting), dar nelaikome atidaryta
-            final isTimeLocked = !(snapshot.data ?? false); 
-            
-            // Bendra užrakinimo būsena (laikas IR užbaigimas)
-            final isLocked = isTimeLocked || isCompletionLocked;
-            
-            final isExpanded = _expandedSections[title]!;
-            final completed = tasks.where((t) => t.done).length;
-            final imageAsset = _sectionImages[title] ?? 'assets/sections/pasiruosimas.jpg';
-            
-            return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                child: Material(
-                    elevation: 0,
-                    borderRadius: BorderRadius.circular(16),
-                    // Pilkiname fono spalvą, jei užrakinta
-                    color: isLocked ? Colors.grey.shade100 : const Color(0xFFF8FFF4), 
-                    child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [
-                                BoxShadow(
-                                    color: isLocked ? Colors.black12 : Colors.green.withOpacity(0.08),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                ),
-                            ],
+      future: WeekAccessService.isWeekAvailable(
+        widget.currentAccountId,
+        weekNumber,
+      ),
+      builder: (context, snapshot) {
+        // isTimeLocked: Ar savaitė jau atidaryta pagal API (duomenys gauti, bet False)
+        final isTimeLocked = !(snapshot.data ?? false);
+
+        // Bendra užrakinimo būsena (laikas IR užbaigimas)
+        final isLocked = isTimeLocked || isCompletionLocked;
+
+        final isExpanded = _expandedSections[title]!;
+        final completed = tasks.where((t) => t.done).length;
+        final imageAsset =
+            _sectionImages[title] ?? 'assets/sections/pasiruosimas.jpg';
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          child: Material(
+            elevation: 0,
+            borderRadius: BorderRadius.circular(16),
+            // Pilkiname fono spalvą, jei užrakinta
+            color: isLocked ? Colors.grey.shade100 : const Color(0xFFF8FFF4),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color:
+                        isLocked
+                            ? Colors.black12
+                            : Colors.green.withOpacity(0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  _buildHeaderBanner(
+                    title: title,
+                    imageAsset: imageAsset,
+                    isExpanded: isExpanded,
+                    isTimeLocked: isTimeLocked,
+                    isCompletionLocked: isCompletionLocked,
+                    completed: completed,
+                    total: tasks.length,
+                    // UŽBLOKUOJAME Paspaudimą
+                    onTap: isLocked ? null : () => _toggleSection(title),
+                  ),
+
+                  // Rodo užduotis TIK, kai nėra užrakinta
+                  if (isExpanded && !isLocked)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD9EDDD),
+                        borderRadius: const BorderRadius.vertical(
+                          bottom: Radius.circular(16),
                         ),
-                        child: Column(
-                            children: [
-                                _buildHeaderBanner(
-                                    title: title,
-                                    imageAsset: imageAsset,
-                                    isExpanded: isExpanded,
-                                    isTimeLocked: isTimeLocked, // <-- NAUJA BŪSENA
-                                    isCompletionLocked: isCompletionLocked, // <-- SENA BŪSENA
-                                    completed: completed,
-                                    total: tasks.length,
-                                    // UŽBLOKUOJAME paspaudimą per InkWell, perduodant null
-                                    onTap: isLocked ? null : () => _toggleSection(title), 
+                      ),
+                      child: Column(
+                        children: [
+                          // ... užduočių sąrašas (ListTile) ...
+                          ...tasks.map(
+                            (task) => Card(
+                              elevation: 0,
+                              margin: const EdgeInsets.symmetric(vertical: 6),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: ListTile(
+                                leading: Icon(
+                                  task.done
+                                      ? Icons.check_circle
+                                      : Icons.radio_button_unchecked,
+                                  color: task.done ? Colors.green : Colors.grey,
                                 ),
-                                
-                                // Rodo užduotis TIK, kai nėra užrakinta laiku ARBA užbaigimu
-                                if (isExpanded && !isLocked)
-                                    Container(
-                                        width: double.infinity,
-                                        padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
-                                        decoration: BoxDecoration(
-                                            color: const Color(0xFFD9EDDD),
-                                            borderRadius: const BorderRadius.vertical(
-                                                bottom: Radius.circular(16),
+                                title: Text(task.text),
+                                // PATAISYMAS: Atkuriame navigaciją be _markTaskComplete
+                                onTap: () {
+                                  if (task.screenBuilder != null) {
+                                    final screen = task.screenBuilder!.call(() {
+                                      setState(() {
+                                        task.done = true;
+                                      });
+                                    });
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => screen),
+                                    );
+                                  } else {
+                                    // Naudojame TaskDetailScreen
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder:
+                                            (_) => TaskDetailScreen(
+                                              task: task,
+                                              // Naudojame tiesioginę setState() logiką
+                                              onComplete: (m) {
+                                                setState(() {
+                                                  task.done = true;
+                                                  task.mood = m;
+                                                });
+                                              },
                                             ),
-                                        ),
-                                        child: Column(
-                                            children: [
-                                                // ... užduočių sąrašas (ListTile) ...
-                                                ...tasks.map(
-                                                    (task) => Card(
-                                                        elevation: 0,
-                                                        margin: const EdgeInsets.symmetric(vertical: 6),
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(12),
-                                                        ),
-                                                        child: ListTile(
-                                                            leading: Icon(
-                                                                task.done
-                                                                    ? Icons.check_circle
-                                                                    : Icons.radio_button_unchecked,
-                                                                color: task.done ? Colors.green : Colors.grey,
-                                                            ),
-                                                            title: Text(task.text),
-                                                            onTap: () {
-                                                                // ... Jūsų navigacijos logika ...
-                                                            },
-                                                        ),
-                                                    ),
-                                                ),
-                                                
-                                                // ... (Progresbaras ir info) ...
-                                            ],
-                                        ),
-                                    ),
-                            ],
-                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                          ),
+
+                          // ... (Progresbaras ir info) ...
+                        ],
+                      ),
                     ),
-                ),
-            );
-        }
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
-}
+  }
+  //   // NAUJAS METODAS SU FUTUREBUILDER
+  //   Widget _buildSection(String title, List<Task> tasks) {
+
+  //     // Gauname savaitės numerį (pvz., 'Minčių sėjimas' -> 2)
+  //     final weekNumber = SECTION_TO_WEEK_MAP[title] ?? 99;
+
+  //     // SENA LOGIKA: Užrakinimas dėl neužbaigtos praeitos savaitės
+  //     final isCompletionLocked = _isSectionLockedByCompletion(title);
+
+  //     // Kviečiame API tikrinti laiko užrakinimą
+  //     return FutureBuilder<bool>(
+  //         future: WeekAccessService.isWeekAvailable(widget.currentAccountId, weekNumber),
+  //         builder: (context, snapshot) {
+
+  //             // isTimeLocked: Ar savaitė jau atidaryta pagal API (duomenys gauti, bet False)
+  //             // Laukimo metu (ConnectionState.waiting), dar nelaikome atidaryta
+  //             final isTimeLocked = !(snapshot.data ?? false);
+
+  //             // Bendra užrakinimo būsena (laikas IR užbaigimas)
+  //             final isLocked = isTimeLocked || isCompletionLocked;
+
+  //             final isExpanded = _expandedSections[title]!;
+  //             final completed = tasks.where((t) => t.done).length;
+  //             final imageAsset = _sectionImages[title] ?? 'assets/sections/pasiruosimas.jpg';
+
+  //             return Padding(
+  //                 padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+  //                 child: Material(
+  //                     elevation: 0,
+  //                     borderRadius: BorderRadius.circular(16),
+  //                     // Pilkiname fono spalvą, jei užrakinta
+  //                     color: isLocked ? Colors.grey.shade100 : const Color(0xFFF8FFF4),
+  //                     child: Container(
+  //                         decoration: BoxDecoration(
+  //                             borderRadius: BorderRadius.circular(16),
+  //                             boxShadow: [
+  //                                 BoxShadow(
+  //                                     color: isLocked ? Colors.black12 : Colors.green.withOpacity(0.08),
+  //                                     blurRadius: 8,
+  //                                     offset: const Offset(0, 4),
+  //                                 ),
+  //                             ],
+  //                         ),
+  //                         child: Column(
+  //                             children: [
+  //                                 _buildHeaderBanner(
+  //                                     title: title,
+  //                                     imageAsset: imageAsset,
+  //                                     isExpanded: isExpanded,
+  //                                     isTimeLocked: isTimeLocked, // <-- NAUJA BŪSENA
+  //                                     isCompletionLocked: isCompletionLocked, // <-- SENA BŪSENA
+  //                                     completed: completed,
+  //                                     total: tasks.length,
+  //                                     // UŽBLOKUOJAME paspaudimą per InkWell, perduodant null
+  //                                     onTap: isLocked ? null : () => _toggleSection(title),
+  //                                 ),
+
+  //                                 // Rodo užduotis TIK, kai nėra užrakinta laiku ARBA užbaigimu
+  //                                 if (isExpanded && !isLocked)
+  //                                     Container(
+  //                                         width: double.infinity,
+  //                                         padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+  //                                         decoration: BoxDecoration(
+  //                                             color: const Color(0xFFD9EDDD),
+  //                                             borderRadius: const BorderRadius.vertical(
+  //                                                 bottom: Radius.circular(16),
+  //                                             ),
+  //                                         ),
+  //                                         child: Column(
+  //                                             children: [
+  //                                                 // ... užduočių sąrašas (ListTile) ...
+  //                                                 ...tasks.map(
+  //                                                     (task) => Card(
+  //                                                         elevation: 0,
+  //                                                         margin: const EdgeInsets.symmetric(vertical: 6),
+  //                                                         shape: RoundedRectangleBorder(
+  //                                                             borderRadius: BorderRadius.circular(12),
+  //                                                         ),
+  //                                                         child: ListTile(
+  //                                                             leading: Icon(
+  //                                                                 task.done
+  //                                                                     ? Icons.check_circle
+  //                                                                     : Icons.radio_button_unchecked,
+  //                                                                 color: task.done ? Colors.green : Colors.grey,
+  //                                                             ),
+  //                                                             title: Text(task.text),
+  //                                                             onTap: () {
+  //                                                                 // ... Jūsų navigacijos logika ...
+  //                                                             },
+  //                                                         ),
+  //                                                     ),
+  //                                                 ),
+
+  //                                                 // ... (Progresbaras ir info) ...
+  //                                             ],
+  //                                         ),
+  //                                     ),
+  //                             ],
+  //                         ),
+  //                     ),
+  //                 ),
+  //             );
+  //         }
+  //     );
+  // }
 
   @override
   Widget build(BuildContext context) {
     final body =
         _currentIndex == 0
             ? ListView(
-                children:
-                    widget.sections.entries
-                        .map((e) => _buildSection(e.key, e.value))
-                        .toList(),
-              )
+              children:
+                  widget.sections.entries
+                      .map((e) => _buildSection(e.key, e.value))
+                      .toList(),
+            )
             : _currentIndex == 1
             ? ResultsScreen(sections: widget.sections)
             : const ExtraMeditationsPage();
@@ -729,8 +859,6 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 }
-
-
 
 class _BannerTextBlock extends StatelessWidget {
   final String title;
