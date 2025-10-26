@@ -35,3 +35,42 @@ class TaskEventApi {
     }
   }
 }
+
+// lib/services/task_service.dart
+
+// Importuojame esamą API klasę
+ // Pakeiskite į teisingą kelio adresą
+
+// Užduočių (Task) verslo logikos sluoksnis
+class TaskService {
+  
+  // Nustatome įvykio tipo pavadinimą, kuris atitiks logiką Django pusėje
+  static const String _completionEvent = 'TASK_COMPLETED';
+
+  // Funkcija, kuri paruošia duomenis ir iškviečia bendrąjį API metodą
+  static Future<bool> completeTask({
+    required String userPin, // Naudojame PIN kaip identifikatorių
+    required String taskCode, // Užduoties kodas, kad Django žinotų, kurią atnaujinti
+  }) async {
+    try {
+      await TaskEventApi.send(
+        pin: userPin,
+        taskCode: taskCode,
+        event: _completionEvent, // Siunčiame konkretų įvykio tipą
+        // Nereikia jokio papildomo payload, nes visa reikalinga info yra
+        // pin, taskCode, event ir serverio laikas (fiksuojamas serveryje)
+      );
+      
+      // Jei aukščiau esanti eilutė neįvykdė Exception, užklausa pavyko
+      return true; 
+      
+    } on Exception catch (e) {
+      // Tvarkome klaidas, kurias išmetė TaskEventApi
+      print('Nepavyko pažymėti užduoties kaip atliktos: $e');
+      return false;
+    }
+  }
+  
+  // Čia vėliau galėtumėte pridėti ir kitus metodus, pvz.:
+  // static Future<List<Task>> getTasks({required String userPin}) async { ... }
+}

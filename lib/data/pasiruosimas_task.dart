@@ -10,6 +10,7 @@ import 'package:garden_app/screens/pages/profesine_savijauta.dart';
 import 'package:garden_app/screens/pages/savybes_pages.dart';
 import 'package:garden_app/services/emoji_api.dart';
 import 'package:garden_app/services/questionnaire_api.dart';
+import 'package:garden_app/services/task_event_api.dart';
 import 'package:garden_app/widgets/text_template.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/task.dart';
@@ -17,6 +18,27 @@ import '../screens/paged_task_screen.dart';
 import '../screens/pages/text_page.dart';
 
 typedef EmojiPageBuilder = Widget Function(ValueChanged<String> onChanged);
+
+Future<void> _reportTaskCompletion(Task task, Function onScreenFinish) async {
+  // 1. Atnaujiname lokalią užduoties būseną
+  task.done = true;
+  onScreenFinish(); // Grįžimas iš ekrano
+
+  // 2. Siunčiame įvykį į serverį
+  final accountId = await Session.getAccountId();
+  if (accountId != null) {
+    try {
+      await TaskService.completeTask(
+        userPin: accountId.toString(),
+        // SVARBU: Naudojame Task.text kaip unikalų taskCode
+        taskCode: task.text,
+      );
+    } catch (e) {
+      // Tvarkome klaidas (galima loginti, bet nereikia rodyti vartotojui)
+      print('Klaida siunčiant užduoties pabaigą: $e');
+    }
+  }
+}
 
 Task makeTaskWithMood({
   required String title,
@@ -35,10 +57,7 @@ Task makeTaskWithMood({
         (onFinish) => PagedTaskScreen(
           title: title,
           taskCode: title, // pvz. "Nuotaika"
-          onFinish: () {
-            t.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(t, onFinish),
           pages: [
             (emojiBuilder ?? defaultEmoji)((emoji) async {
               t.mood = emoji;
@@ -121,44 +140,6 @@ List<Task> buildPasiruosimasTasks() {
       TextPage1(
         'Tikiuosi, kad ši Sodo programa padės Tau siekti Tavo emocinės savijautos gerėjimo tikslų, čia rasi įvairių įrankių, kurie padės Tau jaustis geriau. Taip pat viliuosi, kad kai bus sunku rasti laiko ar nesinorės ateiti į šį Sodą – vis tiek ateisi, nes turėsi aiškiai įvardintas priežastis ir tikslus kodėl tai darai.Iki susitikimo rytoj! Lauksiu Tavęs! :) ',
       ),
-
-      // Phq9Page(),
-      // Gad7Page(),
-      // Phq9Page(
-      //   onSubmitted: (answers, total) async {
-      //     final id = await Session.getAccountId();
-      //     if (id == null) return;
-      //     await QuestionnaireApi.submit(
-      //       accountId: id,
-      //       kind: 'phq9',
-      //       answers: answers,
-      //       total: total,
-      //       taskCode: 'Nuotaika',
-      //     );
-      //   },
-      // ),
-
-      // Gad7Page(
-      //   onSubmitted: (answers, total) async {
-      //     final id = await Session.getAccountId();
-      //     if (id == null) return;
-      //     await QuestionnaireApi.submit(
-      //       accountId: id,
-      //       kind: 'gad7',
-      //       answers: answers,
-      //       total: total,
-      //       taskCode: 'Nuotaika',
-      //     );
-      //   },
-      // ),
-      // TextPage1(
-      //   'Žemiau matysi skalių rezultatus, jos labiausiai vertina depresijos (PHQ-9) '
-      //   'ir nerimo (GAD-7) simptomus. Žiūrėk į rezultatus kritiškai – skalės padeda '
-      //   'suprasti situaciją, tačiau jos nėra diagnozė.\n\n'
-      //   'Jei balai aukšti ir jauti, kad simptomai apsunkina kasdienę veiklą, '
-      //   'santykius ar kelia nuolatinę kančią – verta pasitarti su specialistu.\n\n'
-      //   'Užpildei visas šiandien numatytas skales, puiku! Lauksiu Tavęs rytoj.',
-      // ),
     ],
   );
 

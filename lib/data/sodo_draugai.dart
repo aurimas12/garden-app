@@ -1,10 +1,31 @@
+import 'package:garden_app/data/session.dart';
 import 'package:garden_app/models/task.dart';
 import 'package:garden_app/screens/mood_emoji_page.dart';
 import 'package:garden_app/screens/paged_task_screen.dart';
 import 'package:garden_app/screens/pages/jegu_atstatymas.dart';
 import 'package:garden_app/screens/pages/sodo_draugai_task.dart';
+import 'package:garden_app/services/task_event_api.dart';
 
+Future<void> _reportTaskCompletion(Task task, Function onScreenFinish) async {
+  // 1. Atnaujiname lokalią užduoties būseną
+  task.done = true;
+  onScreenFinish(); // Grįžimas iš ekrano
 
+  // 2. Siunčiame įvykį į serverį
+  final accountId = await Session.getAccountId();
+  if (accountId != null) {
+    try {
+      await TaskService.completeTask(
+        userPin: accountId.toString(),
+        // SVARBU: Naudojame Task.text kaip unikalų taskCode
+        taskCode: task.text, 
+      );
+    } catch (e) {
+      // Tvarkome klaidas (galima loginti, bet nereikia rodyti vartotojui)
+      print('Klaida siunčiant užduoties pabaigą: $e'); 
+    }
+  }
+}
 
 
 List<Task> buildSodoDraugaiTasks() {
@@ -14,10 +35,7 @@ List<Task> buildSodoDraugaiTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Kukutis',
-          onFinish: () {
-            kaipViskasVyks.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -40,10 +58,7 @@ List<Task> buildSodoDraugaiTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Kalnas',
-          onFinish: () {
-            kaipViskasVyks2.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks2, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -67,10 +82,7 @@ List<Task> buildSodoDraugaiTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Draugiški balsai',
-          onFinish: () {
-            kaipViskasVyks3.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks3, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -93,10 +105,7 @@ List<Task> buildSodoDraugaiTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Asertyvumas',
-          onFinish: () {
-            kaipViskasVyks4.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks4, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -118,10 +127,7 @@ List<Task> buildSodoDraugaiTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Kad išgirstų', // buvo "DKad išgirstų"
-          onFinish: () {
-            kaipViskasVyks5.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks5, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -144,10 +150,7 @@ List<Task> buildSodoDraugaiTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Kad išgirsčiau',
-          onFinish: () {
-            kaipViskasVyks6.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks6, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -170,10 +173,7 @@ List<Task> buildSodoDraugaiTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Konfliktų sprendimas',
-          onFinish: () {
-            kaipViskasVyks7.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks7, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {

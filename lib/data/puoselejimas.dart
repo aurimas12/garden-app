@@ -1,9 +1,32 @@
+import 'package:garden_app/data/session.dart';
 import 'package:garden_app/models/task.dart';
 import 'package:garden_app/screens/mood_emoji_page.dart';
 import 'package:garden_app/screens/paged_task_screen.dart';
 import 'package:garden_app/screens/pages/jegu_atstatymas.dart';
 import 'package:garden_app/screens/pages/puoselejimas_task.dart';
 import 'package:garden_app/screens/pages/text_page.dart';
+import 'package:garden_app/services/task_event_api.dart';
+
+Future<void> _reportTaskCompletion(Task task, Function onScreenFinish) async {
+  // 1. Atnaujiname lokalią užduoties būseną
+  task.done = true;
+  onScreenFinish(); // Grįžimas iš ekrano
+
+  // 2. Siunčiame įvykį į serverį
+  final accountId = await Session.getAccountId();
+  if (accountId != null) {
+    try {
+      await TaskService.completeTask(
+        userPin: accountId.toString(),
+        // SVARBU: Naudojame Task.text kaip unikalų taskCode
+        taskCode: task.text, 
+      );
+    } catch (e) {
+      // Tvarkome klaidas (galima loginti, bet nereikia rodyti vartotojui)
+      print('Klaida siunčiant užduoties pabaigą: $e'); 
+    }
+  }
+}
 
 
 List<Task> buildPuoselejimasTasks() {
@@ -14,10 +37,11 @@ List<Task> buildPuoselejimasTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Sunkiu metu',
-          onFinish: () {
-            kaipViskasVyks.done = true;
-            onFinish();
-          },
+          // onFinish: () {
+          //   kaipViskasVyks.done = true;
+          //   onFinish();
+          // },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -41,10 +65,7 @@ List<Task> buildPuoselejimasTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Dar prieš perdegant',
-          onFinish: () {
-            kaipViskasVyks2.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks2, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -67,10 +88,7 @@ List<Task> buildPuoselejimasTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Saugi vieta',
-          onFinish: () {
-            kaipViskasVyks3.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks3, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -94,10 +112,7 @@ List<Task> buildPuoselejimasTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Kūryba ir žaidimas',
-          onFinish: () {
-            kaipViskasVyks4.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks4, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -120,33 +135,25 @@ List<Task> buildPuoselejimasTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Apibendrinimas',
-          onFinish: () {
-            kaipViskasVyks5.done = true;
-            onFinish();
-          },
+          // onFinish: () async {
+          //   kaipViskasVyks5.done = true;
+          //   onFinish();
+
+          //   final accountId = await Session.getAccountId();
+          // if (accountId != null) {
+          //   try {
+          //     // Iškviečiame TaskService, kuris naudoja TaskEventApi
+          //     await TaskService.completeTask(
+          //       userPin: accountId.toString(),
+          //       taskCode: 'Sunkiu metu', // Naudojame Title kaip task_code
+          //     );
+          //   } catch (e) {
+          //     // Tvarkome klaidas, jei reikia
+          //   }
+          // }
+          // },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks5, onFinish),
           pages: [
-            // MoodEmojiPage(
-
-            //   onChanged: (emoji) {
-            //     kaipViskasVyks5.mood = emoji;
-            //     kaipViskasVyks5.done = true;
-            //   },
-            // ),
-            // AllScalesBlock(),
-            // SavijautosKlausimynasBlock(),
-            // EmociniuPokyciuRezultataiBlock(
-            //   depresijaBuvo: 12,
-            //   depresijaDabar: 6,
-            //   nerimasBuvo: 14,
-            //   nerimasDabar: 8,
-            //   savijautaBuvo: 10,
-            //   savijautaDabar: 18,
-            //   atsistatymasBuvo: 28,
-            //   atsistatymasDabar: 42,
-            //   perdegimoPokytisText: 'sumažėjo',
-            // ),
-            // UzpildytosSkalesBlock(),
-
             TextPage1('Noriu paklausti, kaip tau ši Sodo programa? Gal gali apibendrinti, kiek pavyko įsitraukti, kokius pozityvius dalykus išsineši?'),
             TextPage1('Prašau, įrašyk žemiau arba pasakyk sau balsu, kaip įsipareigoji toliau savimi rūpintis?'),
             TextPage1('Siunčiu virtualų apkabinimą! Jeigu nori, gali apkabinti save!'),
@@ -162,10 +169,7 @@ List<Task> buildPuoselejimasTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Sodo vizualizacija',
-          onFinish: () {
-            kaipViskasVyks6.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks6, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
@@ -188,10 +192,7 @@ List<Task> buildPuoselejimasTasks() {
     screenBuilder:
         (onFinish) => PagedTaskScreen(
           title: 'Laiškas',
-          onFinish: () {
-            kaipViskasVyks7.done = true;
-            onFinish();
-          },
+          onFinish: () => _reportTaskCompletion(kaipViskasVyks7, onFinish),
           pages: [
             MoodEmojiPage(
               onChanged: (emoji) {
