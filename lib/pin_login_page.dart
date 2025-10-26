@@ -18,6 +18,8 @@ class _PinLoginPageState extends State<PinLoginPage> {
   bool _busy = false;
   String? _error;
 
+  // pin_login_page.dart (PATAISYTAS _doLogin metodas)
+
   Future<void> _doLogin() async {
     final pin = _c.text.trim();
     if (pin.length != 6) {
@@ -29,13 +31,21 @@ class _PinLoginPageState extends State<PinLoginPage> {
       _error = null;
     });
     try {
-      final accountId = await AuthApi.loginPin(pin);
+      // accountId jau yra ID, kurio jums reikia
+      final accountId = await AuthApi.loginPin(pin); 
+      
+      // Išsaugojimas seanso metu
       await Session.saveAccountId(accountId);
 
       if (!mounted) return;
+      
+      // NAUJA KODO DALIS: Naudojame tiesiog accountId
+      final int newAccountId = accountId; // <-- Pakeista, kad naudotų gautą ID
+      
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => MainScreen(sections: widget.sections),
+          // PRADEDANT MainScreen, perduodame ID
+          builder: (_) => MainScreen(sections: widget.sections, currentAccountId: newAccountId,), 
         ),
       );
     } catch (e) {
@@ -44,6 +54,33 @@ class _PinLoginPageState extends State<PinLoginPage> {
       if (mounted) setState(() => _busy = false);
     }
   }
+  // Future<void> _doLogin() async {
+  //   final pin = _c.text.trim();
+  //   if (pin.length != 6) {
+  //     setState(() => _error = 'Įvesk 6 skaitmenų PIN');
+  //     return;
+  //   }
+  //   setState(() {
+  //     _busy = true;
+  //     _error = null;
+  //   });
+  //   try {
+  //     final accountId = await AuthApi.loginPin(pin);
+  //     await Session.saveAccountId(accountId);
+
+  //     if (!mounted) return;
+  //     final int newAccountId = acc.id;
+  //     Navigator.of(context).pushReplacement(
+  //       MaterialPageRoute(
+  //         builder: (_) => MainScreen(sections: widget.sections,currentAccountId: newAccountId,),
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
+  //   } finally {
+  //     if (mounted) setState(() => _busy = false);
+  //   }
+  // }
 
   @override
   void dispose() {
