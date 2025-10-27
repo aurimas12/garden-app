@@ -1274,8 +1274,8 @@ class _MainScreenState extends State<MainScreen> {
                       .map((e) => _buildSection(e.key, e.value))
                       .toList(),
             )
-            : _currentIndex == 1
-            ? ResultsScreen(sections: widget.sections)
+            // : _currentIndex == 1
+            // ? ResultsScreen(sections: widget.sections)
             : const ExtraMeditationsPage();
 
     return Scaffold(
@@ -1287,7 +1287,14 @@ class _MainScreenState extends State<MainScreen> {
       body: body,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (i) => setState(() => _currentIndex = i),
+        onTap:
+            (i) => setState(() {
+              if (i == 2) {
+                _currentIndex = 1;
+              } else {
+                _currentIndex = i;
+              }
+            }),
         backgroundColor: const Color(0xFFF9FCF9),
         selectedItemColor: Colors.green[800],
         unselectedItemColor: Colors.grey,
