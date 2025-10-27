@@ -1,6 +1,7 @@
 // lib/services/week_access_service.dart
 import 'dart:convert';
 import 'dart:io' show Platform, SocketException;
+import 'package:garden_app/services/task_event_api.dart';
 import 'package:http/http.dart' as http;
 import '../main.dart'; // Kad pasiektumėte _baseUrl
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -40,26 +41,46 @@ class WeekAccessService {
   }
 
   // 2. Patikriname, ar savaitė jau prieinama
+  // static Future<bool> isWeekAvailable(int accountId, int weekNumber) async {
+  //   // 1-oji savaitė visada prieinama
+  //   if (weekNumber == 1) return true; 
+
+  //   final creationDate = await getAccountCreationDate(accountId);
+
+  //   if (creationDate == null) {
+  //     // Jei nepavyko gauti datos, blokuojame viską, išskyrus 1 savaitę
+  //     return false; 
+  //   }
+
+  //   final today = DateTime.now();
+    
+  //   // Dienų skaičius nuo prisijungimo
+  //   final daysPassed = today.difference(creationDate).inDays;
+    
+  //   // Nustatome, kiek dienų reikalaujama (2 savaitė = 7d, 3 sav. = 14d, t.t.)
+  //   final requiredDays = (weekNumber - 1) * 7; 
+    
+  //   // Savaitė atidaroma praėjus reikiamam dienų skaičiui.
+  //   return daysPassed >= requiredDays;
+  // }
+
+
   static Future<bool> isWeekAvailable(int accountId, int weekNumber) async {
     // 1-oji savaitė visada prieinama
-    if (weekNumber == 1) return true; 
+    if (weekNumber == 1) return true;
 
-    final creationDate = await getAccountCreationDate(accountId);
+    // Patikriname, ar visos praeitos savaitės užduotys yra atliktos.
+    // Praeita savaitė yra weekNumber - 1.
+    final previousWeekNumber = weekNumber - 1;
 
-    if (creationDate == null) {
-      // Jei nepavyko gauti datos, blokuojame viską, išskyrus 1 savaitę
-      return false; 
-    }
+    // Senoji logika: Jei praeitos savaitės užduotys yra 100% atliktos,
+    // nauja savaitė atrakinama NEDELSIANT.
+    final isPreviousWeekCompleted = await TaskService.isWeekCompleted(
+      accountId: accountId,
+      weekNumber: previousWeekNumber,
+    );
 
-    final today = DateTime.now();
-    
-    // Dienų skaičius nuo prisijungimo
-    final daysPassed = today.difference(creationDate).inDays;
-    
-    // Nustatome, kiek dienų reikalaujama (2 savaitė = 7d, 3 sav. = 14d, t.t.)
-    final requiredDays = (weekNumber - 1) * 7; 
-    
-    // Savaitė atidaroma praėjus reikiamam dienų skaičiui.
-    return daysPassed >= requiredDays;
+    return isPreviousWeekCompleted; // Grąžiname tik užbaigimo rezultatą
   }
+
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:garden_app/models/task.dart';
 import 'package:http/http.dart' as http;
 
 String get _baseUrl {
@@ -46,7 +47,45 @@ class TaskService {
   
   // Nustatome įvykio tipo pavadinimą, kuris atitiks logiką Django pusėje
   static const String _completionEvent = 'TASK_COMPLETED';
+  // lib/services/task_service.dart
+  static Future<List<Task>> getTasksForWeek(int weekNumber) async {
+        // PAVYZDYS: Čia turėtų būti API kvietimas. Kol kas gražiname fiksuotą sąrašą.
+        // Turėsite rasti būdą, kaip gauti Task objektus Flutteryje.
+        return []; 
+    }
 
+    // Grąžina atliktų užduočių skaičių
+    static Future<int> getCompletedTaskCount({
+      required int accountId,
+      required int weekNumber,
+    }) async {
+        // PAVYZDYS: Čia turėtų būti API kvietimas.
+        // Kol kas grąžiname 0.
+        return 0; 
+    }
+// ... kiti TaskService metodai ...
+
+  static Future<bool> isWeekCompleted({
+    required int accountId,
+    required int weekNumber,
+  }) async {
+    // 1. Gauti visus tasks šiai savaitei
+    final tasks = await getTasksForWeek(weekNumber);
+    if (tasks.isEmpty) {
+      return true; // Jei nėra užduočių, laikome, kad savaitė baigta
+    }
+
+    // 2. Gauti atliktų užduočių skaičių
+    final completedCount = await getCompletedTaskCount(
+      accountId: accountId,
+      weekNumber: weekNumber,
+    );
+
+    // 3. Patikrinti, ar atliktos visos užduotys
+    return completedCount == tasks.length;
+  }
+
+// ... kiti TaskService metodai ...
   // Funkcija, kuri paruošia duomenis ir iškviečia bendrąjį API metodą
   static Future<bool> completeTask({
     required String userPin, // Naudojame PIN kaip identifikatorių
