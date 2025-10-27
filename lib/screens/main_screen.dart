@@ -443,6 +443,7 @@ class _MainScreenState extends State<MainScreen> {
     required bool isCompletionLocked, // <-- SENAS LAUKAS: Užbaigimo užrakinimas
     required int completed,
     required int total,
+    required bool isLocked,
     required VoidCallback? onTap, // Pakeistas į VoidCallback?
   }) {
     final radius = BorderRadius.circular(12);
@@ -562,8 +563,8 @@ class _MainScreenState extends State<MainScreen> {
                         Text(
                           // NAUJAS PRANEŠIMAS: Laikas turi didesnį prioritetą
                           isTimeLocked
-                              ? 'Bus atidaryta, kai praeis laikas' // <-- LAIKO UŽRAKINIMAS
-                              : 'Atrakinsite užbaigę ankstesnę savaitę', // <-- UŽBAIGIMO UŽRAKINIMAS
+                              ? '' // <-- LAIKO UŽRAKINIMAS
+                              : '', // <-- UŽBAIGIMO UŽRAKINIMAS
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -580,12 +581,17 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  // lib/screens/main_screen.dart (pakeiskite visą metodą _buildSection)
+
+  /// lib/screens/main_screen.dart (Pakeiskite visą metodą _buildSection)
+  // lib/screens/main_screen.dart (pakeiskite visą metodą _buildSection)
+
   Widget _buildSection(String title, List<Task> tasks) {
-    // Gauname savaitės numerį (pvz., 'Minčių sėjimas' -> 2)
+    // Ieškome savaitės numerio (pvz., 'Minčių sėjimas' -> 2)
     final weekNumber = SECTION_TO_WEEK_MAP[title] ?? 99;
 
     // SENA LOGIKA: Užrakinimas dėl neužbaigtos praeitos savaitės
-    final isCompletionLocked = _isSectionLockedByCompletion(title);
+    final bool isCompletionLocked = _isSectionLockedByCompletion(title);
 
     // Kviečiame API tikrinti laiko užrakinimą
     return FutureBuilder<bool>(
@@ -594,16 +600,21 @@ class _MainScreenState extends State<MainScreen> {
         weekNumber,
       ),
       builder: (context, snapshot) {
-        // isTimeLocked: Ar savaitė jau atidaryta pagal API (duomenys gauti, bet False)
-        final isTimeLocked = !(snapshot.data ?? false);
+        // isTimeLocked yra TRUE, jei duomenys gauti IR FALSE
+        final bool isTimeLocked = !(snapshot.data ?? false);
 
         // Bendra užrakinimo būsena (laikas IR užbaigimas)
-        final isLocked = isTimeLocked || isCompletionLocked;
+        final bool isLocked = isTimeLocked || isCompletionLocked;
 
         final isExpanded = _expandedSections[title]!;
         final completed = tasks.where((t) => t.done).length;
         final imageAsset =
             _sectionImages[title] ?? 'assets/sections/pasiruosimas.jpg';
+
+        // LOGIKA: Rasti pirmos neužbaigtos užduoties indeksą sekos užrakinimui
+        final int firstIncompleteIndex = tasks.indexWhere((t) => !t.done);
+        final int currentTaskIndex =
+            firstIncompleteIndex == -1 ? tasks.length : firstIncompleteIndex;
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -632,6 +643,7 @@ class _MainScreenState extends State<MainScreen> {
                     title: title,
                     imageAsset: imageAsset,
                     isExpanded: isExpanded,
+                    isLocked: isLocked, // Naudojame isLocked čia
                     isTimeLocked: isTimeLocked,
                     isCompletionLocked: isCompletionLocked,
                     completed: completed,
@@ -640,7 +652,7 @@ class _MainScreenState extends State<MainScreen> {
                     onTap: isLocked ? null : () => _toggleSection(title),
                   ),
 
-                  // Rodo užduotis TIK, kai nėra užrakinta
+                  // Rodo užduotis TIK, kai savaitė atidaryta
                   if (isExpanded && !isLocked)
                     Container(
                       width: double.infinity,
@@ -653,59 +665,131 @@ class _MainScreenState extends State<MainScreen> {
                       ),
                       child: Column(
                         children: [
-                          // ... užduočių sąrašas (ListTile) ...
-                          ...tasks.map(
-                            (task) => Card(
+                          // UŽDUOČIŲ SĄRAŠO LOGIKA
+                          ...tasks.asMap().entries.map((entry) {
+                            final int i = entry.key;
+                            final Task task = entry.value;
+
+                            // UŽDUOTIES SEKOS UŽRAKINIMAS: Atlikta ARBA yra pirma neužbaigta
+                            final bool isSequentiallyAvailable =
+                                task.done || i == currentTaskIndex;
+                            final bool isSequentiallyLocked =
+                                !isSequentiallyAvailable;
+
+                            final VoidCallback? taskOnTap =
+                                isSequentiallyAvailable
+                                    ? () {
+                                      if (task.screenBuilder != null) {
+                                        final screen = task.screenBuilder!.call(
+                                          () {
+                                            setState(() {
+                                              task.done = true;
+                                            });
+                                          },
+                                        );
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => screen,
+                                          ),
+                                        );
+                                      } else {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder:
+                                                (_) => TaskDetailScreen(
+                                                  task: task,
+                                                  onComplete: (m) {
+                                                    // NAUDOJAME _markTaskComplete (dabar jau egzistuoja!)
+                                                    _markTaskComplete(task, m);
+                                                  },
+                                                ),
+                                          ),
+                                        );
+                                      }
+                                    }
+                                    : null; // Išjungti paspaudimą, jei užrakinta
+
+                            return Card(
                               elevation: 0,
                               margin: const EdgeInsets.symmetric(vertical: 6),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: ListTile(
-                                leading: Icon(
-                                  task.done
-                                      ? Icons.check_circle
-                                      : Icons.radio_button_unchecked,
-                                  color: task.done ? Colors.green : Colors.grey,
-                                ),
-                                title: Text(task.text),
-                                // PATAISYMAS: Atkuriame navigaciją be _markTaskComplete
-                                onTap: () {
-                                  if (task.screenBuilder != null) {
-                                    final screen = task.screenBuilder!.call(() {
-                                      setState(() {
-                                        task.done = true;
-                                      });
-                                    });
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => screen),
-                                    );
-                                  } else {
-                                    // Naudojame TaskDetailScreen
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (_) => TaskDetailScreen(
-                                              task: task,
-                                              // Naudojame tiesioginę setState() logiką
-                                              onComplete: (m) {
-                                                setState(() {
-                                                  task.done = true;
-                                                  task.mood = m;
-                                                });
-                                              },
-                                            ),
+                              child: Stack(
+                                children: [
+                                  ListTile(
+                                    leading: Icon(
+                                      task.done
+                                          ? Icons.check_circle
+                                          : (isSequentiallyLocked
+                                              ? Icons.lock
+                                              : Icons.radio_button_unchecked),
+                                      color:
+                                          task.done
+                                              ? Colors.green
+                                              : (isSequentiallyLocked
+                                                  ? Colors.grey
+                                                  : Colors.grey[700]),
+                                    ),
+                                    title: Text(
+                                      task.text,
+                                      style: TextStyle(
+                                        color:
+                                            isSequentiallyLocked
+                                                ? Colors.grey
+                                                : Colors.black,
                                       ),
-                                    );
-                                  }
-                                },
+                                    ),
+                                    onTap: taskOnTap,
+                                  ),
+
+                                  // Vizualinis užrakinimas (pilkas sluoksnis)
+                                  if (isSequentiallyLocked)
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.6),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
+                            );
+                          }),
+
+                          // ... (Jūsų esama progreso rodymo logika) ...
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '$completed iš ${tasks.length} atlikta',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black54,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 140,
+                                  child: LinearProgressIndicator(
+                                    value:
+                                        tasks.isEmpty
+                                            ? 0
+                                            : completed / tasks.length,
+                                    backgroundColor: Colors.white,
+                                    color: Colors.green,
+                                    minHeight: 6,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-
-                          // ... (Progresbaras ir info) ...
                         ],
                       ),
                     ),
@@ -717,6 +801,363 @@ class _MainScreenState extends State<MainScreen> {
       },
     );
   }
+  // Widget _buildSection(String title, List<Task> tasks) {
+  //   // Gauname savaitės numerį (pvz., 'Minčių sėjimas' -> 2)
+  //   final weekNumber = SECTION_TO_WEEK_MAP[title] ?? 99;
+
+  //   // SENA LOGIKA: Užrakinimas dėl neužbaigtos praeitos savaitės
+  //   final bool isCompletionLocked = _isSectionLockedByCompletion(title);
+
+  //   // Kviečiame API tikrinti laiko užrakinimą
+  //   return FutureBuilder<bool>(
+  //     future: WeekAccessService.isWeekAvailable(
+  //       widget.currentAccountId,
+  //       weekNumber,
+  //     ),
+  //     builder: (context, snapshot) {
+  //       // isTimeLocked yra TRUE, jei duomenys gauti IR FALSE
+  //       final bool isTimeLocked = !(snapshot.data ?? false);
+
+  //       // Bendra užrakinimo būsena (laikas IR užbaigimas)
+  //       final bool isLocked = isTimeLocked || isCompletionLocked;
+
+  //       final isExpanded = _expandedSections[title]!;
+  //       final completed = tasks.where((t) => t.done).length;
+  //       final imageAsset =
+  //           _sectionImages[title] ?? 'assets/sections/pasiruosimas.jpg';
+
+  //       // LOGIKA: Rasti pirmos neužbaigtos užduoties indeksą sekos užrakinimui
+  //       final int firstIncompleteIndex = tasks.indexWhere((t) => !t.done);
+  //       final int currentTaskIndex =
+  //           firstIncompleteIndex == -1 ? tasks.length : firstIncompleteIndex;
+
+  //       return Padding(
+  //         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+  //         child: Material(
+  //           elevation: 0,
+  //           borderRadius: BorderRadius.circular(16),
+  //           // Pilkiname fono spalvą, jei užrakinta
+  //           color: isLocked ? Colors.grey.shade100 : const Color(0xFFF8FFF4),
+  //           child: Container(
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(16),
+  //               boxShadow: [
+  //                 BoxShadow(
+  //                   color:
+  //                       isLocked
+  //                           ? Colors.black12
+  //                           : Colors.green.withOpacity(0.08),
+  //                   blurRadius: 8,
+  //                   offset: const Offset(0, 4),
+  //                 ),
+  //               ],
+  //             ),
+  //             child: Column(
+  //               children: [
+  //                 _buildHeaderBanner(
+  //                   title: title,
+  //                   imageAsset: imageAsset,
+  //                   isExpanded: isExpanded,
+  //                   isLocked: isLocked, // Naudojame isLocked čia, kaip anksčiau
+  //                   // NAUJI ARGUMENTAI: PERDUODAMI IŠVIRŠINIŲ METODŲ LOGIKAI
+  //                   isTimeLocked: isTimeLocked, // <--- PRIDĖTAS
+  //                   isCompletionLocked: isCompletionLocked, // <--- PRIDĖTAS
+  //                   completed: completed,
+  //                   total: tasks.length,
+  //                   // UŽBLOKUOJAME Paspaudimą
+  //                   onTap: isLocked ? null : () => _toggleSection(title),
+  //                 ),
+
+  //                 // Rodo užduotis TIK, kai savaitė atidaryta
+  //                 if (isExpanded && !isLocked)
+  //                   Container(
+  //                     width: double.infinity,
+  //                     padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+  //                     decoration: BoxDecoration(
+  //                       color: const Color(0xFFD9EDDD),
+  //                       borderRadius: const BorderRadius.vertical(
+  //                         bottom: Radius.circular(16),
+  //                       ),
+  //                     ),
+  //                     child: Column(
+  //                       children: [
+  //                         // UŽDUOČIŲ SĄRAŠO LOGIKA
+  //                         ...tasks.asMap().entries.map((entry) {
+  //                           final int i = entry.key;
+  //                           final Task task = entry.value;
+
+  //                           // UŽDUOTIES SEKOS UŽRAKINIMAS: Atlikta ARBA yra pirma neužbaigta
+  //                           final bool isSequentiallyAvailable =
+  //                               task.done || i == currentTaskIndex;
+  //                           final bool isSequentiallyLocked =
+  //                               !isSequentiallyAvailable;
+
+  //                           final VoidCallback? taskOnTap =
+  //                               isSequentiallyAvailable
+  //                                   ? () {
+  //                                     if (task.screenBuilder != null) {
+  //                                       final screen = task.screenBuilder!.call(
+  //                                         () {
+  //                                           setState(() {
+  //                                             task.done = true;
+  //                                           });
+  //                                         },
+  //                                       );
+  //                                       Navigator.push(
+  //                                         context,
+  //                                         MaterialPageRoute(
+  //                                           builder: (_) => screen,
+  //                                         ),
+  //                                       );
+  //                                     } else {
+  //                                       Navigator.push(
+  //                                         context,
+  //                                         MaterialPageRoute(
+  //                                           builder:
+  //                                               (_) => TaskDetailScreen(
+  //                                                 task: task,
+  //                                                 onComplete: (m) {
+  //                                                   setState(() {
+  //                                                     task.done = true;
+  //                                                     task.mood = m;
+  //                                                   });
+  //                                                 },
+  //                                               ),
+  //                                         ),
+  //                                       );
+  //                                     }
+  //                                   }
+  //                                   : null; // Išjungti paspaudimą, jei užrakinta
+
+  //                           return Card(
+  //                             elevation: 0,
+  //                             margin: const EdgeInsets.symmetric(vertical: 6),
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(12),
+  //                             ),
+  //                             child: Stack(
+  //                               children: [
+  //                                 ListTile(
+  //                                   leading: Icon(
+  //                                     task.done
+  //                                         ? Icons.check_circle
+  //                                         : (isSequentiallyLocked
+  //                                             ? Icons.lock
+  //                                             : Icons.radio_button_unchecked),
+  //                                     color:
+  //                                         task.done
+  //                                             ? Colors.green
+  //                                             : (isSequentiallyLocked
+  //                                                 ? Colors.grey
+  //                                                 : Colors.grey[700]),
+  //                                   ),
+  //                                   title: Text(
+  //                                     task.text,
+  //                                     style: TextStyle(
+  //                                       color:
+  //                                           isSequentiallyLocked
+  //                                               ? Colors.grey
+  //                                               : Colors.black,
+  //                                     ),
+  //                                   ),
+  //                                   onTap: taskOnTap,
+  //                                 ),
+
+  //                                 // Vizualinis užrakinimas (pilkas sluoksnis)
+  //                                 if (isSequentiallyLocked)
+  //                                   Positioned.fill(
+  //                                     child: Container(
+  //                                       decoration: BoxDecoration(
+  //                                         color: Colors.white.withOpacity(0.6),
+  //                                         borderRadius: BorderRadius.circular(
+  //                                           12,
+  //                                         ),
+  //                                       ),
+  //                                     ),
+  //                                   ),
+  //                               ],
+  //                             ),
+  //                           );
+  //                         }),
+
+  //                         // ... (Jūsų esama progreso rodymo logika) ...
+  //                         Padding(
+  //                           padding: const EdgeInsets.only(top: 6),
+  //                           child: Row(
+  //                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                             children: [
+  //                               Text(
+  //                                 '$completed iš ${tasks.length} atlikta',
+  //                                 style: const TextStyle(
+  //                                   fontSize: 12,
+  //                                   color: Colors.black54,
+  //                                 ),
+  //                               ),
+  //                               SizedBox(
+  //                                 width: 140,
+  //                                 child: LinearProgressIndicator(
+  //                                   value:
+  //                                       tasks.isEmpty
+  //                                           ? 0
+  //                                           : completed / tasks.length,
+  //                                   backgroundColor: Colors.white,
+  //                                   color: Colors.green,
+  //                                   minHeight: 6,
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
+  // Widget _buildSection(String title, List<Task> tasks) {
+  //   // Gauname savaitės numerį (pvz., 'Minčių sėjimas' -> 2)
+  //   final weekNumber = SECTION_TO_WEEK_MAP[title] ?? 99;
+
+  //   // SENA LOGIKA: Užrakinimas dėl neužbaigtos praeitos savaitės
+  //   final isCompletionLocked = _isSectionLockedByCompletion(title);
+
+  //   // Kviečiame API tikrinti laiko užrakinimą
+  //   return FutureBuilder<bool>(
+  //     future: WeekAccessService.isWeekAvailable(
+  //       widget.currentAccountId,
+  //       weekNumber,
+  //     ),
+  //     builder: (context, snapshot) {
+  //       // isTimeLocked: Ar savaitė jau atidaryta pagal API (duomenys gauti, bet False)
+  //       final isTimeLocked = !(snapshot.data ?? false);
+
+  //       // Bendra užrakinimo būsena (laikas IR užbaigimas)
+  //       final isLocked = isTimeLocked || isCompletionLocked;
+
+  //       final isExpanded = _expandedSections[title]!;
+  //       final completed = tasks.where((t) => t.done).length;
+  //       final imageAsset =
+  //           _sectionImages[title] ?? 'assets/sections/pasiruosimas.jpg';
+
+  //       return Padding(
+  //         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+  //         child: Material(
+  //           elevation: 0,
+  //           borderRadius: BorderRadius.circular(16),
+  //           // Pilkiname fono spalvą, jei užrakinta
+  //           color: isLocked ? Colors.grey.shade100 : const Color(0xFFF8FFF4),
+  //           child: Container(
+  //             decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(16),
+  //               boxShadow: [
+  //                 BoxShadow(
+  //                   color:
+  //                       isLocked
+  //                           ? Colors.black12
+  //                           : Colors.green.withOpacity(0.08),
+  //                   blurRadius: 8,
+  //                   offset: const Offset(0, 4),
+  //                 ),
+  //               ],
+  //             ),
+  //             child: Column(
+  //               children: [
+  //                 _buildHeaderBanner(
+  //                   title: title,
+  //                   imageAsset: imageAsset,
+  //                   isExpanded: isExpanded,
+  //                   isTimeLocked: isTimeLocked,
+  //                   isCompletionLocked: isCompletionLocked,
+  //                   completed: completed,
+  //                   total: tasks.length,
+  //                   // UŽBLOKUOJAME Paspaudimą
+  //                   onTap: isLocked ? null : () => _toggleSection(title),
+  //                 ),
+
+  //                 // Rodo užduotis TIK, kai nėra užrakinta
+  //                 if (isExpanded && !isLocked)
+  //                   Container(
+  //                     width: double.infinity,
+  //                     padding: const EdgeInsets.fromLTRB(12, 8, 12, 12),
+  //                     decoration: BoxDecoration(
+  //                       color: const Color(0xFFD9EDDD),
+  //                       borderRadius: const BorderRadius.vertical(
+  //                         bottom: Radius.circular(16),
+  //                       ),
+  //                     ),
+  //                     child: Column(
+  //                       children: [
+  //                         // ... užduočių sąrašas (ListTile) ...
+  //                         ...tasks.map(
+  //                           (task) => Card(
+  //                             elevation: 0,
+  //                             margin: const EdgeInsets.symmetric(vertical: 6),
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(12),
+  //                             ),
+  //                             child: ListTile(
+  //                               leading: Icon(
+  //                                 task.done
+  //                                     ? Icons.check_circle
+  //                                     : Icons.radio_button_unchecked,
+  //                                 color: task.done ? Colors.green : Colors.grey,
+  //                               ),
+  //                               title: Text(task.text),
+  //                               // PATAISYMAS: Atkuriame navigaciją be _markTaskComplete
+  //                               onTap: () {
+  //                                 if (task.screenBuilder != null) {
+  //                                   final screen = task.screenBuilder!.call(() {
+  //                                     setState(() {
+  //                                       task.done = true;
+  //                                     });
+  //                                   });
+  //                                   Navigator.push(
+  //                                     context,
+  //                                     MaterialPageRoute(builder: (_) => screen),
+  //                                   );
+  //                                 } else {
+  //                                   // Naudojame TaskDetailScreen
+  //                                   Navigator.push(
+  //                                     context,
+  //                                     MaterialPageRoute(
+  //                                       builder:
+  //                                           (_) => TaskDetailScreen(
+  //                                             task: task,
+  //                                             // Naudojame tiesioginę setState() logiką
+  //                                             onComplete: (m) {
+  //                                               setState(() {
+  //                                                 task.done = true;
+  //                                                 task.mood = m;
+  //                                               });
+  //                                             },
+  //                                           ),
+  //                                     ),
+  //                                   );
+  //                                 }
+  //                               },
+  //                             ),
+  //                           ),
+  //                         ),
+
+  //                         // ... (Progresbaras ir info) ...
+  //                       ],
+  //                     ),
+  //                   ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
   //   // NAUJAS METODAS SU FUTUREBUILDER
   //   Widget _buildSection(String title, List<Task> tasks) {
 
@@ -852,7 +1293,7 @@ class _MainScreenState extends State<MainScreen> {
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Sekcijos'),
-          BottomNavigationBarItem(icon: Icon(Icons.check), label: 'Rezultatai'),
+          // BottomNavigationBarItem(icon: Icon(Icons.check), label: 'Rezultatai'),
           BottomNavigationBarItem(icon: Icon(Icons.widgets), label: 'Extra'),
         ],
       ),

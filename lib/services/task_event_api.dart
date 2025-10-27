@@ -51,14 +51,21 @@ class TaskService {
   static Future<bool> completeTask({
     required String userPin, // Naudojame PIN kaip identifikatorių
     required String taskCode, // Užduoties kodas, kad Django žinotų, kurią atnaujinti
+    String? mood,
   }) async {
     try {
+      final Map<String, dynamic> payload = {};
+      if (mood != null) {
+        payload['mood'] = mood; // Jei mood nėra null, pridedame jį
+      }
+      
       await TaskEventApi.send(
         pin: userPin,
         taskCode: taskCode,
         event: _completionEvent, // Siunčiame konkretų įvykio tipą
         // Nereikia jokio papildomo payload, nes visa reikalinga info yra
         // pin, taskCode, event ir serverio laikas (fiksuojamas serveryje)
+        payload: payload.isNotEmpty ? payload : null,
       );
       
       // Jei aukščiau esanti eilutė neįvykdė Exception, užklausa pavyko
