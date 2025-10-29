@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-
+import 'package:garden_app/services/task_event_api.dart';
+import 'package:garden_app/services/sessions.dart';
 
 class JeguMoodEmojiPage extends StatefulWidget {
   const JeguMoodEmojiPage({super.key});
@@ -63,7 +64,6 @@ class _JeguMoodEmojiPageState extends State<JeguMoodEmojiPage> {
     );
   }
 }
-
 
 class SavijautosScalePage extends StatefulWidget {
   const SavijautosScalePage({super.key});
@@ -141,7 +141,6 @@ class _SavijautosScalePageState extends State<SavijautosScalePage> {
     );
   }
 }
-
 
 class RecoveryExperiencePage extends StatefulWidget {
   const RecoveryExperiencePage({super.key});
@@ -247,7 +246,6 @@ class JeguResultsInfoPage extends StatelessWidget {
   }
 }
 
-
 class JeguEndPage extends StatelessWidget {
   const JeguEndPage({super.key});
 
@@ -276,7 +274,6 @@ class apie1 extends StatelessWidget {
     );
   }
 }
-
 
 class klausimynas1 extends StatefulWidget {
   const klausimynas1({super.key});
@@ -356,8 +353,6 @@ class _RoleSelectionPageState extends State<klausimynas1> {
             ),
           ),
           const SizedBox(height: 32),
-
-        
         ],
       ),
     );
@@ -527,7 +522,6 @@ class _PsichologinisKlausimynasPageState
           ),
 
           const SizedBox(height: 32),
-          
         ],
       ),
     );
@@ -769,10 +763,8 @@ class _AudioIntroPageState extends State<AudioIntroPage1> {
           ),
           const SizedBox(height: 32),
 
-         
           ElevatedButton.icon(
             onPressed: () {
-             
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Įrašymo pradžia (kol kas simuliacija)'),
@@ -784,10 +776,8 @@ class _AudioIntroPageState extends State<AudioIntroPage1> {
           ),
           const SizedBox(height: 16),
 
-      
           OutlinedButton(
             onPressed: () {
-            
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Pasirinkta tęsti be įrašymo')),
               );
@@ -876,7 +866,6 @@ class _PsichoKomponentaiPageState extends State<PsichoKomponentaiPage> {
           ),
 
           const SizedBox(height: 24),
-         
         ],
       ),
     );
@@ -909,7 +898,7 @@ class _PsichoKomponentaiPageState extends State<PsichoKomponentaiPage> {
 
 class KvepavimoMeditacijaPage extends StatefulWidget {
   final VoidCallback? onNext;
-
+  final String audioCode = 'audio/kvepavimas.mp3'; // <-- UNIKALUS KODAS
   const KvepavimoMeditacijaPage({super.key, this.onNext});
 
   @override
@@ -927,7 +916,6 @@ class _KvepavimoMeditacijaPageState extends State<KvepavimoMeditacijaPage> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
@@ -939,7 +927,6 @@ class _KvepavimoMeditacijaPageState extends State<KvepavimoMeditacijaPage> {
 
   Future<void> _preload() async {
     try {
-
       await _audioPlayer.setSource(AssetSource('audio/kvepavimas.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -960,9 +947,17 @@ class _KvepavimoMeditacijaPageState extends State<KvepavimoMeditacijaPage> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-     
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');
@@ -1037,6 +1032,7 @@ class _KvepavimoMeditacijaPageState extends State<KvepavimoMeditacijaPage> {
 
 class Audio1Page extends StatefulWidget {
   final VoidCallback? onNext;
+  final String audioCode = 'audio/stebejimas.mp3'; // <-- UNIKALUS KODAS
 
   const Audio1Page({super.key, this.onNext});
 
@@ -1054,11 +1050,9 @@ class _Audio1PageState extends State<Audio1Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
-
 
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
@@ -1067,7 +1061,6 @@ class _Audio1PageState extends State<Audio1Page> {
 
   Future<void> _preload() async {
     try {
-    
       await _audioPlayer.setSource(AssetSource('audio/stebejimas.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1088,9 +1081,17 @@ class _Audio1PageState extends State<Audio1Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-  
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');
@@ -1164,7 +1165,7 @@ class _Audio1PageState extends State<Audio1Page> {
 
 class Audio2Page extends StatefulWidget {
   final VoidCallback? onNext;
-
+  final String audioCode = 'audio/judesiai.mp3'; // <-- UNIKALUS KODAS
   const Audio2Page({super.key, this.onNext});
 
   @override
@@ -1181,7 +1182,6 @@ class _Audio2PageState extends State<Audio2Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
@@ -1193,7 +1193,6 @@ class _Audio2PageState extends State<Audio2Page> {
 
   Future<void> _preload() async {
     try {
-
       await _audioPlayer.setSource(AssetSource('audio/judesiai.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1214,9 +1213,17 @@ class _Audio2PageState extends State<Audio2Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');
@@ -1285,7 +1292,7 @@ class _Audio2PageState extends State<Audio2Page> {
 
 class Audio3Page extends StatefulWidget {
   final VoidCallback? onNext;
-
+  final String audioCode = 'audio/kunoskenavimas.mp3'; // <-- UNIKALUS KODAS
   const Audio3Page({super.key, this.onNext});
 
   @override
@@ -1302,12 +1309,10 @@ class _Audio3PageState extends State<Audio3Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
 
-  
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _preload();
@@ -1315,7 +1320,6 @@ class _Audio3PageState extends State<Audio3Page> {
 
   Future<void> _preload() async {
     try {
-
       await _audioPlayer.setSource(AssetSource('audio/kunoskenavimas.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1336,9 +1340,17 @@ class _Audio3PageState extends State<Audio3Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-   
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');
@@ -1407,7 +1419,7 @@ class _Audio3PageState extends State<Audio3Page> {
 
 class Audio4Page extends StatefulWidget {
   final VoidCallback? onNext;
-
+  final String audioCode = 'audio/relaksacija.mp3'; // <-- UNIKALUS KODAS
   const Audio4Page({super.key, this.onNext});
 
   @override
@@ -1424,11 +1436,9 @@ class _Audio4PageState extends State<Audio4Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
-
 
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
@@ -1437,7 +1447,6 @@ class _Audio4PageState extends State<Audio4Page> {
 
   Future<void> _preload() async {
     try {
-
       await _audioPlayer.setSource(AssetSource('audio/relaksacija.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1458,9 +1467,17 @@ class _Audio4PageState extends State<Audio4Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-   
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');
@@ -1537,7 +1554,7 @@ class _Audio4PageState extends State<Audio4Page> {
 
 class Audio5Page extends StatefulWidget {
   final VoidCallback? onNext;
-
+  final String audioCode = 'audio/kalnomeditacija.mp3'; // <-- UNIKALUS KODAS
   const Audio5Page({super.key, this.onNext});
 
   @override
@@ -1554,7 +1571,6 @@ class _Audio5PageState extends State<Audio5Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
@@ -1566,7 +1582,6 @@ class _Audio5PageState extends State<Audio5Page> {
 
   Future<void> _preload() async {
     try {
-
       await _audioPlayer.setSource(AssetSource('audio/kalnomeditacija.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1587,9 +1602,17 @@ class _Audio5PageState extends State<Audio5Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-    
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');
@@ -1658,7 +1681,7 @@ class _Audio5PageState extends State<Audio5Page> {
 
 class Audio6Page extends StatefulWidget {
   final VoidCallback? onNext;
-
+  final String audioCode = 'audio/sedejimomeditacija.mp3'; // <-- UNIKALUS KODAS
   const Audio6Page({super.key, this.onNext});
 
   @override
@@ -1675,11 +1698,9 @@ class _Audio6PageState extends State<Audio6Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
-
 
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
@@ -1688,7 +1709,6 @@ class _Audio6PageState extends State<Audio6Page> {
 
   Future<void> _preload() async {
     try {
-
       await _audioPlayer.setSource(AssetSource('audio/sedejimomeditacija.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1709,9 +1729,17 @@ class _Audio6PageState extends State<Audio6Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');
@@ -1780,7 +1808,7 @@ class _Audio6PageState extends State<Audio6Page> {
 
 class Audio7Page extends StatefulWidget {
   final VoidCallback? onNext;
-
+  final String audioCode = 'audio/pedos.mp3'; // <-- UNIKALUS KODAS
   const Audio7Page({super.key, this.onNext});
 
   @override
@@ -1797,11 +1825,9 @@ class _Audio7PageState extends State<Audio7Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
- 
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
-
 
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
@@ -1810,7 +1836,6 @@ class _Audio7PageState extends State<Audio7Page> {
 
   Future<void> _preload() async {
     try {
-  
       await _audioPlayer.setSource(AssetSource('audio/pedos.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1831,9 +1856,17 @@ class _Audio7PageState extends State<Audio7Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');
@@ -1902,7 +1935,7 @@ class _Audio7PageState extends State<Audio7Page> {
 
 class Audio8Page extends StatefulWidget {
   final VoidCallback? onNext;
-
+  final String audioCode = 'audio/mylintisgerumas3.mp3'; // <-- UNIKALUS KODAS
   const Audio8Page({super.key, this.onNext});
 
   @override
@@ -1919,11 +1952,9 @@ class _Audio8PageState extends State<Audio8Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
-
 
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
@@ -1932,7 +1963,6 @@ class _Audio8PageState extends State<Audio8Page> {
 
   Future<void> _preload() async {
     try {
-
       await _audioPlayer.setSource(AssetSource('audio/mylintisgerumas3.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -1953,9 +1983,17 @@ class _Audio8PageState extends State<Audio8Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');
@@ -2024,7 +2062,7 @@ class _Audio8PageState extends State<Audio8Page> {
 
 class Audio9Page extends StatefulWidget {
   final VoidCallback? onNext;
-
+  final String audioCode = 'audio/esamojolaiko.mp3'; // <-- UNIKALUS KODAS
   const Audio9Page({super.key, this.onNext});
 
   @override
@@ -2041,7 +2079,6 @@ class _Audio9PageState extends State<Audio9Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
@@ -2053,7 +2090,6 @@ class _Audio9PageState extends State<Audio9Page> {
 
   Future<void> _preload() async {
     try {
-
       await _audioPlayer.setSource(AssetSource('audio/esamojolaiko.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -2074,9 +2110,17 @@ class _Audio9PageState extends State<Audio9Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');
@@ -2145,7 +2189,7 @@ class _Audio9PageState extends State<Audio9Page> {
 
 class Audio10Page extends StatefulWidget {
   final VoidCallback? onNext;
-
+  final String audioCode = 'audio/saugivieta.mp3'; // <-- UNIKALUS KODAS
   const Audio10Page({super.key, this.onNext});
 
   @override
@@ -2162,11 +2206,9 @@ class _Audio10PageState extends State<Audio10Page> {
     super.initState();
     _audioPlayer = AudioPlayer();
 
-
     _audioPlayer.onPlayerComplete.listen((_) {
       setState(() => _isPlaying = false);
     });
-
 
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
@@ -2175,7 +2217,6 @@ class _Audio10PageState extends State<Audio10Page> {
 
   Future<void> _preload() async {
     try {
-
       await _audioPlayer.setSource(AssetSource('audio/saugivieta.mp3'));
       setState(() => _isLoaded = true);
     } catch (e) {
@@ -2196,9 +2237,17 @@ class _Audio10PageState extends State<Audio10Page> {
         await _audioPlayer.pause();
         setState(() => _isPlaying = false);
       } else {
-  
         await _audioPlayer.resume();
         setState(() => _isPlaying = true);
+
+        final accountId = await Session.getAccountId(); // GAUNAME VARTOTOJO ID
+        if (accountId != null) {
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame audio failo kelią kaip unikalų kodą
+            audioCode: widget.audioCode,
+          );
+        }
       }
     } catch (e) {
       _showSnack('Klaida grojant audio: $e');

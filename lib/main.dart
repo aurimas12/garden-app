@@ -31,7 +31,7 @@ import 'package:garden_app/task_utils.dart';
 //     'Puoselėjimas': buildPuoselejimasTasks(),
 //   };
 
-//   await Session.fixLegacy(); 
+//   await Session.fixLegacy();
 
 //   final accountId = await Session.getAccountId();
 //   final isLoggedIn = accountId != null;
@@ -50,17 +50,15 @@ import 'package:garden_app/task_utils.dart';
 //     return MaterialApp(
 //       title: 'Sodas',
 //       theme: ThemeData(primarySwatch: Colors.green),
-   
+
 //       home:
 //           // isLoggedIn
 //           //     ? MainScreen(sections: sections)
 //           //     : PinLoginPage(sections: sections),
-          
+
 //     );
 //   }
 // }
-
-
 
 // main.dart
 
@@ -90,13 +88,15 @@ Future<void> main() async {
     'Puoselėjimas': buildPuoselejimasTasks(),
   };
 
-  await Session.fixLegacy(); 
+  await Session.fixLegacy();
 
   final accountId = await Session.getAccountId();
   final isLoggedIn = accountId != null;
 
   // SVARBU: Perduodame accountId į MyApp
-  runApp(MyApp(sections: sections, isLoggedIn: isLoggedIn, accountId: accountId)); 
+  runApp(
+    MyApp(sections: sections, isLoggedIn: isLoggedIn, accountId: accountId),
+  );
 }
 
 // ***************************************************************
@@ -109,34 +109,39 @@ class MyApp extends StatelessWidget {
   final int? accountId; // <-- PRIDĖTAS LAUKAS
 
   // Atnaujiname konstruktorių
-  const MyApp({super.key, required this.sections, required this.isLoggedIn, this.accountId}); 
+  const MyApp({
+    super.key,
+    required this.sections,
+    required this.isLoggedIn,
+    this.accountId,
+  });
 
   // @override
   // Widget build(BuildContext context) {
   //   return MaterialApp(
   //     title: 'Sodas',
   //     theme: ThemeData(primarySwatch: Colors.green),
-    
+
   //     home:
   //         isLoggedIn
   //             ? FutureBuilder<Map<String, List<Task>>>( // <-- NAUDOJAME FutureBuilder
   //                 // Iškviečiame filtravimo funkciją
-  //                 future: getAvailableSections(sections, accountId!), 
+  //                 future: getAvailableSections(sections, accountId!),
   //                 builder: (context, snapshot) {
   //                   if (snapshot.connectionState == ConnectionState.waiting) {
   //                     // Rodo krovimą, kol laukiame API atsakymo
   //                     return const Scaffold(
   //                       body: Center(child: CircularProgressIndicator()),
-  //                     ); 
+  //                     );
   //                   }
-                    
+
   //                   if (snapshot.hasError) {
   //                     // Rodo klaidą, jei nepavyko pasiekti API
   //                     return Scaffold(
-  //                       body: Center(child: Text('Klaida: ${snapshot.error}')), 
-  //                     ); 
+  //                       body: Center(child: Text('Klaida: ${snapshot.error}')),
+  //                     );
   //                   }
-                    
+
   //                   // Sėkmės atveju naudojame filtruotas sekcijas
   //                   final filteredSections = snapshot.data ?? {};
   //                   return MainScreen(sections: filteredSections);
@@ -146,29 +151,28 @@ class MyApp extends StatelessWidget {
   //   );
   // }
 
-
-
   // main.dart (PATAISYTA)
 
-@override
-Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     // Saugiai gauname accountId. Jis bus null, jei neprisijungęs.
-    final currentAccountId = accountId; 
-    
+    final currentAccountId = accountId;
+
     // Nustatome, ar rodomas pagrindinis ekranas (prisijungęs IR turi ID)
     final shouldShowMainScreen = isLoggedIn && currentAccountId != null;
 
     return MaterialApp(
       title: 'Sodas',
       theme: ThemeData(primarySwatch: Colors.green),
-    
-      home: shouldShowMainScreen 
-          ? MainScreen(
-              sections: sections, 
-              // SVARBU: Perduodame accountId į MainScreen
-              currentAccountId: currentAccountId, 
-            )
-          : PinLoginPage(sections: sections),
+
+      home:
+          shouldShowMainScreen
+              ? MainScreen(
+                sections: sections,
+                // SVARBU: Perduodame accountId į MainScreen
+                currentAccountId: currentAccountId,
+              )
+              : PinLoginPage(sections: sections),
     );
-}
+  }
 }

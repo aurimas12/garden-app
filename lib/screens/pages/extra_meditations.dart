@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import '/services/task_event_api.dart'; // BŪTINAS IMPORTAS
+import '/services/sessions.dart';
 
 class ExtraMeditationsPage extends StatefulWidget {
   const ExtraMeditationsPage({super.key});
@@ -12,10 +14,9 @@ class ExtraMeditationsPage extends StatefulWidget {
 
 class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
   final _player = AudioPlayer();
-  int? _currentIndex; 
-  String? _lastError; 
+  int? _currentIndex;
+  String? _lastError;
   bool _assetsOk = false;
-
 
   final _tracks = const [
     _Track(
@@ -59,7 +60,6 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
   }
 
   void _wirePlayerEvents() {
-
     _player.playerStateStream.listen(
       (state) {
         if (state.processingState == ProcessingState.completed) {
@@ -107,10 +107,10 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
     }
   }
 
- 
-
   Future<void> _playIndex(int index) async {
     final assetPath = 'assets/audio/${_tracks[index].fileName}';
+    final bool isStartingNewTrack =
+        _currentIndex != index; // Ar pradedame naują takelį?
 
     if (!await _assetExists(assetPath)) {
       setState(
@@ -128,6 +128,23 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
       }
       await _player.play();
       setState(() => _lastError = null);
+
+      // *******************************************************
+      // NAUJA LOGIKA: ĮVYKIO FIKSAVIMAS
+      // *******************************************************
+      if (isStartingNewTrack) {
+        final accountId = await Session.getAccountId();
+        if (accountId != null) {
+          final track = _tracks[index];
+          // Siunčiame įvykį. Nereikia laukti, kad neblokuotų grojimo
+          TaskService.reportAudioListen(
+            accountId: accountId,
+            // Naudojame failo pavadinimą kaip unikalų kodą
+            audioCode: 'extra/${track.fileName}',
+          );
+        }
+      }
+      // *******************************************************
     } catch (e) {
       setState(
         () => _lastError = 'Nepavyko paleisti „${_tracks[index].title}“: $e',
@@ -147,8 +164,8 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
 
   Future<void> _stop() async {
     try {
-      await _player.stop(); 
-      _currentIndex = null; 
+      await _player.stop();
+      _currentIndex = null;
       setState(() {});
     } catch (e) {
       setState(() => _lastError = 'Stop klaida: $e');
@@ -209,13 +226,11 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
               final isThis = _currentIndex == index;
               final isPlaying = isThis && _player.playing;
 
-              
               final IconData mainIcon =
                   isPlaying ? Icons.pause_circle : Icons.play_circle_fill;
               final VoidCallback mainHandler =
                   isPlaying ? () => _pause() : () => _playIndex(index);
 
-          
               final bool canStop = isThis;
 
               return Container(
@@ -238,7 +253,6 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                 
                       Row(
                         children: [
                           Expanded(
@@ -267,7 +281,6 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
                         ],
                       ),
 
-                
                       if (isThis) ...[
                         const SizedBox(height: 4),
                         StreamBuilder<Duration?>(
@@ -321,7 +334,6 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
                         const SizedBox(height: 4),
                       ],
 
-               
                       Text(
                         track.prettyId,
                         style: theme.textTheme.bodySmall?.copyWith(
@@ -341,9 +353,9 @@ class _ExtraMeditationsPageState extends State<ExtraMeditationsPage> {
 }
 
 class _Track {
-  final String fileName; 
-  final String title; 
-  final String prettyId; 
+  final String fileName;
+  final String title;
+  final String prettyId;
   const _Track({
     required this.fileName,
     required this.title,
