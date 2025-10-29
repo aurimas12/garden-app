@@ -9,7 +9,7 @@ String get _baseUrl {
   if (Platform.isAndroid) return 'http://10.0.2.2:8000';
   return 'http://127.0.0.1:8000';
 }
-
+const String _audioRecordStartEvent = 'AUDIO_RECORD_START';
 class TaskEventApi {
   static Future<void> send({
     required String pin,
@@ -54,6 +54,23 @@ class TaskService {
     return [];
   }
 
+  static Future<void> reportAudioRecordStart({
+      required int accountId,
+      required String taskCode, // Unikalus užduoties kodas (pvz., 'sodo_vizualizacija_balso_irasas')
+    }) async {
+        try {
+            // Naudojame TaskEventApi.send siųsti įvykį į Django
+            await TaskEventApi.send(
+                pin: accountId.toString(),
+                taskCode: taskCode,
+                event: _audioRecordStartEvent, // Naudojame naują konstantą
+                payload: null, // Nesiunčiame papildomų duomenų
+            );
+        } catch (e) {
+            // Spausdiname klaidą, jei nepavyko pasiekti API
+            print('Klaida siunčiant įrašymo pradžios įvykį: $e'); 
+        }
+    }
   static Future<void> reportAudioListen({
     required int accountId,
     required String audioCode, // Pvz.: 'kvepavimas.mp3' arba 'relaksacija.mp3'
@@ -136,4 +153,48 @@ class TaskService {
 
   // Čia vėliau galėtumėte pridėti ir kitus metodus, pvz.:
   // static Future<List<Task>> getTasks({required String userPin}) async { ... }
+}
+
+
+// lib/services/audio_api.dart (Naujas failas, arba pridėkite prie TaskEventApi)
+
+// Pridėtas pagalbinis modelis
+class AudioAssetModel {
+  final String code;
+  final String assetPath;
+
+  AudioAssetModel(this.code, this.assetPath);
+
+  factory AudioAssetModel.fromJson(Map<String, dynamic> json) {
+    return AudioAssetModel(
+      json['code'] as String,
+      json['asset_path'] as String,
+    );
+  }
+}
+
+
+class AudioApi {
+  // ... (Jūsų _baseUrl) ...
+  
+  // Sukurkite metodą, kuris gaus visus audio įrašus
+  static Future<List<AudioAssetModel>> getAudioAssets() async {
+    // Pavyzdinis endpoint, kurį reikės sukurti Django (žr. toliau ⬇️)
+    final url = Uri.parse('$_baseUrl/api/audio/assets/'); 
+    
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((json) => AudioAssetModel.fromJson(json)).toList();
+      } else {
+        // ... Klaidos apdorojimas ...
+        return [];
+      }
+    } catch (e) {
+      // ... Klaidos apdorojimas ...
+      return [];
+    }
+  }
 }

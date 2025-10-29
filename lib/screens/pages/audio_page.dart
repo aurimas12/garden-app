@@ -3,12 +3,15 @@ import 'dart:io' show File, Platform;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:garden_app/data/session.dart';
+import 'package:garden_app/services/task_event_api.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 
 class AudioIntroPage2 extends StatefulWidget {
-  const AudioIntroPage2({super.key});
+  final VoidCallback? onFinished;
+  const AudioIntroPage2({super.key, this.onFinished});
 
   @override
   State<AudioIntroPage2> createState() => _AudioIntroPage2State();
@@ -23,8 +26,8 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
   Duration _elapsed = Duration.zero;
   Timer? _ticker;
 
-  String? _nativePath; 
-  String? _webUrl; 
+  String? _nativePath;
+  String? _webUrl;
 
   DateTime? _startedAt;
 
@@ -51,11 +54,29 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
     });
   }
 
+  // Future<String> _makeNativePath() async {
+
+  //   final dir = await getApplicationDocumentsDirectory();
+  //   final ts = DateTime.now().millisecondsSinceEpoch;
+  //   return '${dir.path}/voice_$ts.m4a';
+  // }
+
   Future<String> _makeNativePath() async {
-   
+    // Gauname ID tiesiogiai, kadangi reikia jį įtraukti į kelią
+    final accountId = await Session.getAccountId();
+    const String recordingTaskCode =
+        'sodo_vizualizacija'; // Paimta iš _startRecording()
+
     final dir = await getApplicationDocumentsDirectory();
-    final ts = DateTime.now().millisecondsSinceEpoch;
-    return '${dir.path}/voice_$ts.m4a';
+    final String ts = DateTime.now().toUtc().toIso8601String().replaceAll(
+      RegExp(r'[^\w]'),
+      '_',
+    ); // Datą paverčiame failo vardu
+
+    // NAUJAS UNIKALUS PAVADINIMAS: accountId_taskCode_timestamp.m4a
+    final String filename = '${accountId}_${recordingTaskCode}_$ts.m4a';
+
+    return '${dir.path}/$filename';
   }
 
   Future<void> _startRecording() async {
@@ -74,14 +95,13 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
       _startedAt = DateTime.now();
 
       if (kIsWeb) {
-       
         await _rec.start(
           const RecordConfig(
             encoder: AudioEncoder.opus,
             sampleRate: 48000,
             bitRate: 128000,
           ),
-          path: 'web', 
+          path: 'web',
         );
         _webUrl = null;
         _nativePath = null;
@@ -89,11 +109,11 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
         final path = await _makeNativePath();
         await _rec.start(
           const RecordConfig(
-            encoder: AudioEncoder.aacLc, 
+            encoder: AudioEncoder.aacLc,
             sampleRate: 44100,
             bitRate: 128000,
           ),
-          path: path, 
+          path: path,
         );
         _nativePath = path;
         _webUrl = null;
@@ -104,6 +124,7 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
         _isPaused = false;
       });
       _startTicker();
+
       _snack('Įrašymas pradėtas.');
     } catch (e) {
       _snack('Klaida pradedant įrašymą: $e');
@@ -136,19 +157,19 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
     try {
       if (!_isRecording) return;
 
-      final result =
-          await _rec.stop();
+      final result = await _rec.stop();
       _ticker?.cancel();
 
       if (kIsWeb) {
-        _webUrl = result; 
+        _webUrl = result;
         _nativePath = null;
         if (_webUrl != null) {
           await _player.setUrl(_webUrl!);
         }
       } else {
-        _nativePath = result; 
+        _nativePath = result;
         _webUrl = null;
+        print('ĮRAŠYTA SĖKMINGAI! Kelias: $_nativePath');
         if (_nativePath != null) {
           await _player.setFilePath(_nativePath!);
         }
@@ -204,7 +225,6 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
           ),
           const SizedBox(height: 24),
 
-        
           Row(
             children: [
               Icon(
@@ -224,7 +244,6 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
           ),
           const SizedBox(height: 12),
 
- 
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -247,14 +266,13 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
               ElevatedButton.icon(
                 onPressed: _isRecording ? _stopRecording : null,
                 icon: const Icon(Icons.stop),
-                label: const Text('Stabdyti'),
+                label: const Text('Saugoti'),
               ),
             ],
           ),
 
           const SizedBox(height: 16),
 
-        
           if (hasResult) ...[
             const Divider(height: 24),
             Text(
@@ -270,21 +288,17 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
                   label: const Text('Leisti'),
                 ),
                 const SizedBox(width: 12),
-         
               ],
             ),
-    
           ],
 
           const SizedBox(height: 24),
-
 
           OutlinedButton(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Pasirinkta tęsti be įrašymo')),
               );
-
             },
             child: const Text('Tęsti be įrašymo'),
           ),

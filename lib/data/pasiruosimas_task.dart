@@ -93,6 +93,7 @@ List<Task> buildPasiruosimasTasks() {
       TextTemplate(
         standalone: false,
         children: [
+          AudioIntroPage2(),
           P(
             'Džiugu, kad prisijungei, čia rūpinsimės Tavo vidiniu sodu. Šią programą sudaro trumpos praktikos, kurios skatins atsigręžti į save. '
             'Tikiuosi, kad po 8 savaičių Sodo programos, tavo savijauta pagerės.\n\n'
