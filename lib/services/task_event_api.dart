@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io' show Platform;
+import 'dart:io' show Platform, File;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:garden_app/models/task.dart';
@@ -57,39 +57,43 @@ class TaskService {
     // Turėsite rasti būdą, kaip gauti Task objektus Flutteryje.
     return [];
   }
-  // Naujas kintamasis saugoti prisijungimo statusui (pasirenkama, bet rekomenduojama)
-    static ValueNotifier<String?> currentPin = ValueNotifier(null);
 
-    // Pridėkite šį metodą TaskService klasėje:
-    static Future<void> logout() async {
-        final prefs = await SharedPreferences.getInstance();
-        
-        // Ištrina PIN kodą iš lokalaus saugyklos
-        await prefs.remove('account_pin');
-        
-        // Atnaujina statusą, jei naudojate ValueNotifier
-        currentPin.value = null; 
-        
-        // DABAR: Naviguokite į prisijungimo ekraną (LoginScreen/IntroPage, priklausomai nuo Jūsų struktūros)
-        // Tai TURI būti atliekama programos eigoje, pavyzdžiui, mygtuko handler'yje.
-    }
+  // Naujas kintamasis saugoti prisijungimo statusui (pasirenkama, bet rekomenduojama)
+  static ValueNotifier<String?> currentPin = ValueNotifier(null);
+
+  // Pridėkite šį metodą TaskService klasėje:
+  static Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Ištrina PIN kodą iš lokalaus saugyklos
+    await prefs.remove('account_pin');
+
+    // Atnaujina statusą, jei naudojate ValueNotifier
+    currentPin.value = null;
+
+    // DABAR: Naviguokite į prisijungimo ekraną (LoginScreen/IntroPage, priklausomai nuo Jūsų struktūros)
+    // Tai TURI būti atliekama programos eigoje, pavyzdžiui, mygtuko handler'yje.
+  }
+
   static Future<void> reportAudioRecordStart({
-      required int accountId,
-      required String taskCode, // Unikalus užduoties kodas (pvz., 'sodo_vizualizacija_balso_irasas')
-    }) async {
-        try {
-            // Naudojame TaskEventApi.send siųsti įvykį į Django
-            await TaskEventApi.send(
-                pin: accountId.toString(),
-                taskCode: taskCode,
-                event: _audioRecordStartEvent, // Naudojame naują konstantą
-                payload: null, // Nesiunčiame papildomų duomenų
-            );
-        } catch (e) {
-            // Spausdiname klaidą, jei nepavyko pasiekti API
-            print('Klaida siunčiant įrašymo pradžios įvykį: $e'); 
-        }
+    required int accountId,
+    required String
+    taskCode, // Unikalus užduoties kodas (pvz., 'sodo_vizualizacija_balso_irasas')
+  }) async {
+    try {
+      // Naudojame TaskEventApi.send siųsti įvykį į Django
+      await TaskEventApi.send(
+        pin: accountId.toString(),
+        taskCode: taskCode,
+        event: _audioRecordStartEvent, // Naudojame naują konstantą
+        payload: null, // Nesiunčiame papildomų duomenų
+      );
+    } catch (e) {
+      // Spausdiname klaidą, jei nepavyko pasiekti API
+      print('Klaida siunčiant įrašymo pradžios įvykį: $e');
     }
+  }
+
   static Future<void> reportAudioListen({
     required int accountId,
     required String audioCode, // Pvz.: 'kvepavimas.mp3' arba 'relaksacija.mp3'
@@ -106,6 +110,97 @@ class TaskService {
       print('Klaida siunčiant audio klausymo įvykį: $e');
     }
   }
+
+  // =========================================================================
+  // PAGALBINĖ FUNKCIJA (Pakeičia TaskService.uploadAudioFile)
+  // Ši funkcija atsakinga už failo siuntimą į Django/S3 ir lokalaus failo trynimą.
+  // =========================================================================
+
+  static Future<bool> _uploadAudioFileAndRegisterEvent(
+    String localPath,
+    int accountId,
+    String taskCode,
+  ) async {
+    // 1. Įrašomas TaskEvent įvykis (AUDIO_RECORD_START)
+    try {
+      await TaskEventApi.send(
+        pin: accountId.toString(),
+        taskCode: taskCode,
+        event: 'AUDIO_RECORD_START', // Registruojame įvykį DB
+        payload: null,
+      );
+    } catch (e) {
+      print('DB KLAIDA: Nepavyko užfiksuoti AUDIO_RECORD_START įvykio. $e');
+      // Tęsiame, bet failas galimai nebus įkeltas.
+    }
+
+    // 2. TIKRASIS FAILO ĮKĖLIMAS Į S3
+    var uri = Uri.parse('$_baseUrl/api/audio-upload/');
+
+    var request =
+        http.MultipartRequest('POST', uri)
+          ..fields['account'] = accountId.toString()
+          ..fields['task_code'] = taskCode
+          ..files.add(
+            await http.MultipartFile.fromPath(
+              'audio_file', // TURI ATITIKTI AudioUploadSerializer lauką!
+              localPath,
+            ),
+          );
+
+    try {
+      var response = await request.send();
+      if (response.statusCode == 201) {
+        // JEI SĖKMĖ: Triname failą iš telefono
+        await File(localPath).delete();
+        return true;
+      } else {
+        // Klaida (pvz., Django atmetė, bet failas liko lokaliai)
+        return false;
+      }
+    } catch (e) {
+      // Tinklo klaida
+      return false;
+    }
+  }
+  // static Future<bool> uploadAudioFile(
+  //   String localPath,
+  //   int accountId,
+  //   String taskCode,
+  // ) async {
+  //   final uri = Uri.parse('$_baseUrl/api/audio-upload/');
+
+  //   var request =
+  //       http.MultipartRequest('POST', uri)
+  //         // 1. Įprasti laukai
+  //         ..fields['account'] = accountId.toString()
+  //         ..fields['task_code'] = taskCode
+  //         // 2. Failas (audio_file turi atitikti serializatoriaus lauką)
+  //         ..files.add(
+  //           await http.MultipartFile.fromPath(
+  //             'audio_file', // <- Šis pavadinimas TURI ATITIKTI modelio lauką!
+  //             localPath,
+  //             // contentType: MediaType('audio', 'm4a'), // Galite nurodyti tipą
+  //           ),
+  //         );
+
+  //   try {
+  //     var response = await request.send();
+  //     if (response.statusCode == 201) {
+  //       print('✅ Audio įkėlimas į S3 sėkmingas!');
+  //       // TIK DABAR galite SAUGIAI ištrinti failą iš lokalaus disko
+  //       await File(localPath).delete();
+  //       return true;
+  //     } else {
+  //       print('❌ Įkėlimas nepavyko. Statusas: ${response.statusCode}');
+  //       // NENAUDOJAME File(localPath).delete(), jei nepavyko, kad būtų galima bandyti dar kartą
+  //       return false;
+  //     }
+  //   } catch (e) {
+  //     print('❌ Įkėlimo Klaida: $e');
+  //     return false;
+  //   }
+  // }
 
   // Grąžina atliktų užduočių skaičių
   static Future<int> getCompletedTaskCount({
@@ -170,20 +265,19 @@ class TaskService {
     }
   }
 
-
   static Future<String?> getAccountId() async {
-        if (currentPin.value != null) {
-            return currentPin.value;
-        }
-        final prefs = await SharedPreferences.getInstance();
-        final pin = prefs.getString('account_pin');
-        currentPin.value = pin; // Išsaugojame
-        return pin;
+    if (currentPin.value != null) {
+      return currentPin.value;
     }
+    final prefs = await SharedPreferences.getInstance();
+    final pin = prefs.getString('account_pin');
+    currentPin.value = pin; // Išsaugojame
+    return pin;
+  }
+
   // Čia vėliau galėtumėte pridėti ir kitus metodus, pvz.:
   // static Future<List<Task>> getTasks({required String userPin}) async { ... }
 }
-
 
 // lib/services/audio_api.dart (Naujas failas, arba pridėkite prie TaskEventApi)
 
@@ -202,15 +296,14 @@ class AudioAssetModel {
   }
 }
 
-
 class AudioApi {
   // ... (Jūsų _baseUrl) ...
-  
+
   // Sukurkite metodą, kuris gaus visus audio įrašus
   static Future<List<AudioAssetModel>> getAudioAssets() async {
     // Pavyzdinis endpoint, kurį reikės sukurti Django (žr. toliau ⬇️)
-    final url = Uri.parse('$_baseUrl/api/audio/assets/'); 
-    
+    final url = Uri.parse('$_baseUrl/api/audio/assets/');
+
     try {
       final response = await http.get(url);
 

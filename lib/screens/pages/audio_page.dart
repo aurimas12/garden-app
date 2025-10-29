@@ -5,12 +5,72 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:garden_app/data/session.dart';
 import 'package:garden_app/services/task_event_api.dart';
+import 'package:http/http.dart' as http;
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 
+String get _baseUrl {
+  if (kIsWeb) return 'http://127.0.0.1:8000';
+  if (Platform.isAndroid) return 'http://10.0.2.2:8000';
+  return 'http://127.0.0.1:8000';
+}
+// =========================================================================
+// PAGALBINĖ FUNKCIJA (Pakeičia TaskService.uploadAudioFile)
+// Ši funkcija atsakinga už failo siuntimą į Django/S3 ir lokalaus failo trynimą.
+// =========================================================================
+
+Future<bool> _uploadAudioFileAndRegisterEvent(
+  String localPath,
+  int accountId,
+  String taskCode,
+) async {
+  // 1. Įrašomas TaskEvent įvykis (AUDIO_RECORD_START)
+  try {
+    await TaskEventApi.send(
+      pin: accountId.toString(),
+      taskCode: taskCode,
+      event: 'AUDIO_RECORD_START', // Registruojame įvykį DB
+      payload: null,
+    );
+  } catch (e) {
+    print('DB KLAIDA: Nepavyko užfiksuoti AUDIO_RECORD_START įvykio. $e');
+    // Tęsiame, bet failas galimai nebus įkeltas.
+  }
+
+  // 2. TIKRASIS FAILO ĮKĖLIMAS Į S3 api/tasks/audio-upload/
+  var uri = Uri.parse('$_baseUrl/api/tasks/audio-upload/');
+
+  var request =
+      http.MultipartRequest('POST', uri)
+        ..fields['account'] = accountId.toString()
+        ..fields['task_code'] = taskCode
+        ..files.add(
+          await http.MultipartFile.fromPath(
+            'audio_file', // TURI ATITIKTI AudioUploadSerializer lauką!
+            localPath,
+          ),
+        );
+
+  try {
+    var response = await request.send();
+    if (response.statusCode == 201) {
+      // JEI SĖKMĖ: Triname failą iš telefono
+      await File(localPath).delete();
+      return true;
+    } else {
+      // Klaida (pvz., Django atmetė, bet failas liko lokaliai)
+      return false;
+    }
+  } catch (e) {
+    // Tinklo klaida
+    return false;
+  }
+}
+
 class AudioIntroPage2 extends StatefulWidget {
   final VoidCallback? onFinished;
+  final String recordingTaskCode = 'sodo_vizualizacija';
   const AudioIntroPage2({super.key, this.onFinished});
 
   @override
@@ -64,8 +124,8 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
   Future<String> _makeNativePath() async {
     // Gauname ID tiesiogiai, kadangi reikia jį įtraukti į kelią
     final accountId = await Session.getAccountId();
-    const String recordingTaskCode =
-        'sodo_vizualizacija'; // Paimta iš _startRecording()
+    // const String recordingTaskCode =
+    // 'sodo_vizualizacija'; // Paimta iš _startRecording()
 
     final dir = await getApplicationDocumentsDirectory();
     final String ts = DateTime.now().toUtc().toIso8601String().replaceAll(
@@ -74,7 +134,7 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
     ); // Datą paverčiame failo vardu
 
     // NAUJAS UNIKALUS PAVADINIMAS: accountId_taskCode_timestamp.m4a
-    final String filename = '${accountId}_${recordingTaskCode}_$ts.m4a';
+    final String filename = '${accountId}_${widget.recordingTaskCode}_$ts.m4a';
 
     return '${dir.path}/$filename';
   }
@@ -117,6 +177,23 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
         );
         _nativePath = path;
         _webUrl = null;
+
+        // const String recordingTaskCode = 'sodo_vizualizacija';
+        // final accountId = await Session.getAccountId();
+
+        // if (accountId != null) {
+        //   final success = await TaskService.uploadAudioFile(
+        //     _nativePath!,
+        //     accountId,
+        //     recordingTaskCode,
+        //   );
+        //   if (success) {
+        //     _snack('Įrašas sėkmingai įkeltas į S3 ir išsaugotas DB.');
+        //     // Jei sėkmė, _nativePath bus ištrintas uploadAudioFile viduje
+        //   } else {
+        //     _snack('Įrašas liko tik lokaliai (klaida įkeliant).');
+        //   }
+        // }
       }
 
       setState(() {
@@ -127,24 +204,24 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
       // **********************************************************
       // TIESIOGINĖ DB FIKSACIJA (MINIMALU)
       // **********************************************************
-      const String recordingTaskCode = 'sodo_vizualizacija';
-      final accountId = await Session.getAccountId();
+      // const String recordingTaskCode = 'sodo_vizualizacija';
+      // final accountId = await Session.getAccountId();
 
-      if (accountId != null) {
-        // Reikalingas TaskService importas (kurį turite būti atlikęs)
-        // TaskService.reportAudioRecordStart(
-        //   accountId: accountId,
-        //   taskCode: recordingTaskCode,
-        // );
+      // if (accountId != null) {
+      //   // Reikalingas TaskService importas (kurį turite būti atlikęs)
+      //   // TaskService.reportAudioRecordStart(
+      //   //   accountId: accountId,
+      //   //   taskCode: recordingTaskCode,
+      //   // );
 
-        // NAUDOJAME TIESIOGINĮ API KVETIMĄ, KAIP JŪS PRAŠĖTE PILDYTI ANKSČIAU
-        TaskEventApi.send(
-          pin: accountId.toString(),
-          taskCode: recordingTaskCode,
-          event: 'AUDIO_RECORD_START',
-          payload: null,
-        );
-      }
+      //   // NAUDOJAME TIESIOGINĮ API KVETIMĄ, KAIP JŪS PRAŠĖTE PILDYTI ANKSČIAU
+      //   TaskEventApi.send(
+      //     pin: accountId.toString(),
+      //     taskCode: recordingTaskCode,
+      //     event: 'AUDIO_RECORD_START',
+      //     payload: null,
+      //   );
+      // }
       // **********************************************************
 
       _snack('Įrašymas pradėtas.');
@@ -196,7 +273,22 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
           await _player.setFilePath(_nativePath!);
         }
       }
+      if (!kIsWeb && _nativePath != null) {
+        final accountId = await Session.getAccountId();
+        if (accountId != null) {
+          final success = await _uploadAudioFileAndRegisterEvent(
+            _nativePath!,
+            accountId,
+            widget.recordingTaskCode,
+          );
 
+          if (success) {
+            _snack('✅ Įrašas sėkmingai įkeltas į S3 ir registruotas DB.');
+          } else {
+            _snack('⚠️ Klaida įkeliant į S3! Įrašas liko tik telefone.');
+          }
+        }
+      }
       setState(() {
         _isRecording = false;
         _isPaused = false;
