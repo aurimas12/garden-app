@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
 import 'package:garden_app/models/task.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 String get _baseUrl {
   if (kIsWeb) return 'http://127.0.0.1:8000';
@@ -55,7 +57,22 @@ class TaskService {
     // Turėsite rasti būdą, kaip gauti Task objektus Flutteryje.
     return [];
   }
+  // Naujas kintamasis saugoti prisijungimo statusui (pasirenkama, bet rekomenduojama)
+    static ValueNotifier<String?> currentPin = ValueNotifier(null);
 
+    // Pridėkite šį metodą TaskService klasėje:
+    static Future<void> logout() async {
+        final prefs = await SharedPreferences.getInstance();
+        
+        // Ištrina PIN kodą iš lokalaus saugyklos
+        await prefs.remove('account_pin');
+        
+        // Atnaujina statusą, jei naudojate ValueNotifier
+        currentPin.value = null; 
+        
+        // DABAR: Naviguokite į prisijungimo ekraną (LoginScreen/IntroPage, priklausomai nuo Jūsų struktūros)
+        // Tai TURI būti atliekama programos eigoje, pavyzdžiui, mygtuko handler'yje.
+    }
   static Future<void> reportAudioRecordStart({
       required int accountId,
       required String taskCode, // Unikalus užduoties kodas (pvz., 'sodo_vizualizacija_balso_irasas')
@@ -153,6 +170,16 @@ class TaskService {
     }
   }
 
+
+  static Future<String?> getAccountId() async {
+        if (currentPin.value != null) {
+            return currentPin.value;
+        }
+        final prefs = await SharedPreferences.getInstance();
+        final pin = prefs.getString('account_pin');
+        currentPin.value = pin; // Išsaugojame
+        return pin;
+    }
   // Čia vėliau galėtumėte pridėti ir kitus metodus, pvz.:
   // static Future<List<Task>> getTasks({required String userPin}) async { ... }
 }

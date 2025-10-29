@@ -365,14 +365,15 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:garden_app/pin_login_page.dart';
 import 'package:garden_app/screens/pages/extra_meditations.dart';
+import 'package:garden_app/services/task_event_api.dart';
 import 'package:garden_app/task_utils.dart';
 import '../models/task.dart';
 import 'task_detail_screen.dart';
-import 'results_screen.dart';
 // NAUJI IMPORTAI:
 import '../services/week_access_service.dart'; // Savaitės prieinamumo servisas
-import '../task_utils.dart'; // SECTION_TO_WEEK_MAP (Žemėlapis)
+
 
 class MainScreen extends StatefulWidget {
   final Map<String, List<Task>> sections;
@@ -1283,6 +1284,29 @@ class _MainScreenState extends State<MainScreen> {
       appBar: AppBar(
         title: const Text('Mano sodas'),
         backgroundColor: Colors.green,
+        actions: [
+          // Atsijungimo mygtukas
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () async {
+              await TaskService.logout();
+              
+              // Po atsijungimo, nukreipiame į prisijungimo puslapį.
+              // Naudokite tą maršrutą, kuris inicijuoja PIN įvedimą:
+              // context.go('/'); // Pavyzdžiui, nukreipia į pradinį (root) maršrutą
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                // Naudojame PinLoginPage, kurią sukūrėte, su sekcijomis
+                MaterialPageRoute(
+                    builder: (ctx) => PinLoginPage(sections: widget.sections) 
+                ),
+                // Pašaliname visas kitas istorijos vietas, kad negalėtų grįžti atgal
+                (Route<dynamic> route) => false, 
+            );
+              }
+            },
+          ),
+        ],
       ),
       body: body,
       bottomNavigationBar: BottomNavigationBar(
