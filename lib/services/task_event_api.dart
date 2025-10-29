@@ -9,7 +9,7 @@ String get _baseUrl {
   if (Platform.isAndroid) return 'http://10.0.2.2:8000';
   return 'http://127.0.0.1:8000';
 }
-const String _audioRecordStartEvent = 'AUDIO_RECORD_START';
+
 class TaskEventApi {
   static Future<void> send({
     required String pin,
@@ -32,6 +32,7 @@ class TaskEventApi {
     );
 
     if (res.statusCode != 201) {
+      print('DJANGO 400 KLAIDA BODY: ${res.body}');
       throw Exception('TaskEvent klaida: ${res.statusCode} ${res.body}');
     }
   }
@@ -47,6 +48,7 @@ class TaskService {
   // Nustatome įvykio tipo pavadinimą, kuris atitiks logiką Django pusėje
   static const String _completionEvent = 'TASK_COMPLETED';
   static const String _audioListenEvent = 'AUDIO_LISTEN'; // <-- NAUJA KONSTANTA
+  static const String _audioRecordStartEvent = 'AUDIO_RECORD_START';
   // lib/services/task_service.dart
   static Future<List<Task>> getTasksForWeek(int weekNumber) async {
     // PAVYZDYS: Čia turėtų būti API kvietimas. Kol kas gražiname fiksuotą sąrašą.

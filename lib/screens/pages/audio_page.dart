@@ -124,6 +124,28 @@ class _AudioIntroPage2State extends State<AudioIntroPage2> {
         _isPaused = false;
       });
       _startTicker();
+      // **********************************************************
+      // TIESIOGINĖ DB FIKSACIJA (MINIMALU)
+      // **********************************************************
+      const String recordingTaskCode = 'sodo_vizualizacija';
+      final accountId = await Session.getAccountId();
+
+      if (accountId != null) {
+        // Reikalingas TaskService importas (kurį turite būti atlikęs)
+        // TaskService.reportAudioRecordStart(
+        //   accountId: accountId,
+        //   taskCode: recordingTaskCode,
+        // );
+
+        // NAUDOJAME TIESIOGINĮ API KVETIMĄ, KAIP JŪS PRAŠĖTE PILDYTI ANKSČIAU
+        TaskEventApi.send(
+          pin: accountId.toString(),
+          taskCode: recordingTaskCode,
+          event: 'AUDIO_RECORD_START',
+          payload: null,
+        );
+      }
+      // **********************************************************
 
       _snack('Įrašymas pradėtas.');
     } catch (e) {
